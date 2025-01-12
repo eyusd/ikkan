@@ -1,0 +1,23 @@
+{
+  "name": "ikkan",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [],
+  "author": "eyusd",
+  "license": "MIT",
+  "packageManager": "pnpm@9.15.3",
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "clean": "turbo run clean",
+    "test": "turbo run test",
+    "publish-packages": "turbo run build lint test && changeset publish"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.27.11",
+    "@types/node": "^22.10.5",
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.3"
+  }
+}
