@@ -20,7 +20,8 @@
   },
   "dependencies": {
     "@ikkan/core": "workspace:*",
-    "swr": "^2.3.0"
+    "swr": "^2.3.0",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@types/react": "^19.0.4",

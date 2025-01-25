@@ -1,13 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
-
-export type SerializedAPIError = { message: string; status: number, data?: Object };
+export type SerializedAPIError = { message: string; data?: unknown };
 
 // For the API
 export class APIError extends Error {
   constructor(
     public message: string,
     public status: number = 500,
-    public data?: any
+    public data?: unknown
   ) {
     super(message);
     this.name = "APIError";
@@ -18,75 +16,31 @@ export class APIError extends Error {
   toJSON(): SerializedAPIError {
     return {
       message: this.message,
-      status: this.status,
       data: this.data,
     };
   }
 }
 
-
 // For the consumers of the API
 export type NoAPIError<T> = T extends SerializedAPIError ? never : T;
 export const isSerializedAPIError = (
-  something: any,
-): something is SerializedAPIError => something && something.message && something.status;
-
-
-function handleError(error: unknown): NextResponse {
-  if (error instanceof APIError) {
-    return NextResponse.json(error.toJSON(), { status: error.status });
-  }
-  if (error instanceof Error) {
-    return NextResponse.json(new APIError(error.message).toJSON(), {
-      status: 500,
-    });
-  }
-
-  const defaultError: SerializedAPIError = {
-    message: "An unexpected error occurred",
-    status: 500,
-    data: { error },
-  };
-  return NextResponse.json(defaultError, {
-    status: 500,
-  });
+  something: unknown
+): something is SerializedAPIError => {
+  return (
+    typeof something === "object" &&
+    something !== null &&
+    "message" in something &&
+    typeof (something as SerializedAPIError).message === "string"
+  );
 }
 
-
-// Bridge
-type Handler<Args extends any[], ReturnType> = (
-  req: NextRequest,
-  ...operationParameters: Args
-) => Promise<ReturnType>;
-
-
-export async function APIErrorWrapper<Args extends any[], ReturnType>(
-  operation: Handler<Args, ReturnType>,
-  req: NextRequest,
-  ...parameters: Args
-): Promise<NextResponse> {
-  try {
-    return NextResponse.json(await operation(req, ...parameters), {
-      status: 200,
-    });
-  } catch (error) {
-    return handleError(error);
-  }
-}
-
-export async function ExoticAPIErrorWrapper<
-  Args extends any[],
-  ReturnType extends ArrayBuffer,
->(
-  operation: Handler<Args, ReturnType>,
-  req: NextRequest,
-  ...parameters: Args
-): Promise<NextResponse> {
-  try {
-    return new NextResponse(await operation(req, ...parameters), {
-      status: 200,
-    });
-  } catch (error) {
-    return handleError(error);
-  }
+const COMMON_ERRORS = {
+  invalidParams: new APIError("Invalid parameters", 400),
+  requestError: new APIError("Request error", 400),
+  internalServerError: new APIError("Internal server error", 500),
+};
+export function makeCommonError(type: keyof typeof COMMON_ERRORS, data: unknown) {
+  const error = COMMON_ERRORS[type];
+  error.data = data;
+  return error;
 }
