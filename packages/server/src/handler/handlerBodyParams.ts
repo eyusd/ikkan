@@ -10,7 +10,7 @@ import {
 
 export async function parseBodyGuard<T extends z.ZodType>(
   req: NextRequest,
-  schema: T
+  schema: T,
 ): Promise<z.infer<T>> {
   try {
     return schema.parse(await req.json());
@@ -24,10 +24,8 @@ export async function parseBodyGuard<T extends z.ZodType>(
 
 export function ikkanHandlerBodyParams<
   Output extends JsonValue | void = void,
-  Schema extends z.ZodType | undefined = undefined
->(
-  params: IkkanMethodHandlerParams<Output, Schema>
-): NextHandler<Output> {
+  Schema extends z.ZodType | undefined = undefined,
+>(params: IkkanMethodHandlerParams<Output, Schema>): NextHandler<Output> {
   if ("schema" in params) {
     const { schema, fn } = params;
     return async (req, context) => {

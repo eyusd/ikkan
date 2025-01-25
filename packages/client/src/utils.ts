@@ -10,31 +10,31 @@ import { mutate } from "swr";
 
 export type Operator<
   Output extends JsonValue,
-  Schema extends z.ZodType | undefined = undefined
+  Schema extends z.ZodType | undefined = undefined,
 > = (
   params: Schema extends undefined
     ? undefined
     : z.infer<Exclude<Schema, undefined>>,
-  options?: RequestInit
-) => Promise<Output>; 
+  options?: RequestInit,
+) => Promise<Output>;
 
 export function makeOperator<
   Endpoint extends string,
   Output extends JsonValue,
   Schema extends z.ZodType | undefined = undefined,
-  Mut extends [string, unknown][] = []
+  Mut extends [string, unknown][] = [],
 >(
   url: Endpoint,
   fetcher: Fetcher<Endpoint, Output, Schema>,
   waterfall: {
     [K in keyof Mut]: WaterfallFunction<Mut[K][0], Output, Mut[K][1]>;
-  }
+  },
 ): Operator<Output, Schema> {
   return async (
     params: Schema extends undefined
       ? undefined
       : z.infer<Exclude<Schema, undefined>>,
-    options?: RequestInit
+    options?: RequestInit,
   ) => {
     try {
       const response = await fetcher(url, params, options);
@@ -48,7 +48,7 @@ export function makeOperator<
             revalidate: false,
             rollbackOnError: true,
           });
-        })
+        }),
       );
 
       return response;

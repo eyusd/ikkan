@@ -8,14 +8,14 @@ export function makeFetcherBodyParams<
   Endpoint extends string,
   Method extends NextHTTPMethod,
   Output extends JsonValue,
-  Schema extends z.ZodType | undefined = undefined
+  Schema extends z.ZodType | undefined = undefined,
 >(method: Method): Fetcher<Endpoint, Output, Schema> {
   return async (
     url: Endpoint,
     params: Schema extends undefined
       ? undefined
       : z.infer<Exclude<Schema, undefined>>,
-    options?: RequestInit
+    options?: RequestInit,
   ): Promise<Output> =>
     fetch(url, {
       method,

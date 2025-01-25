@@ -10,14 +10,14 @@ import {
 
 export async function parseParamsGuard<T extends z.ZodType>(
   req: NextRequest,
-  schema: T
+  schema: T,
 ): Promise<z.infer<T>> {
   try {
     const url = new URL(req.url);
     const keys = zodKeys(schema);
     const params = JSON.parse(url.searchParams.get("params") ?? "{}");
     return schema.parse(
-      Object.fromEntries(keys.map((key) => [key, params[key] ?? null]))
+      Object.fromEntries(keys.map((key) => [key, params[key] ?? null])),
     );
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -29,10 +29,8 @@ export async function parseParamsGuard<T extends z.ZodType>(
 
 export function ikkanHandlerSearchParams<
   Output extends JsonValue | void = void,
-  Schema extends z.ZodType | undefined = undefined
->(
-  params: IkkanMethodHandlerParams<Output, Schema>
-): NextHandler<Output> {
+  Schema extends z.ZodType | undefined = undefined,
+>(params: IkkanMethodHandlerParams<Output, Schema>): NextHandler<Output> {
   if ("schema" in params) {
     const { schema, fn } = params;
     return async (req, context) => {

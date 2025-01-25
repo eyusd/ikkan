@@ -15,8 +15,7 @@
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts",
     "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
-    "clean": "rm -rf dist",
-    "lint": "tsc --noEmit"
+    "clean": "rm -rf dist && rm -rf node_modules"
   },
   "dependencies": {
     "@ikkan/core": "workspace:*",
@@ -26,6 +25,7 @@
   "devDependencies": {
     "@types/react": "^19.0.4",
     "@types/react-dom": "^19.0.2",
+    "globals": "^15.14.0",
     "next": "^15.1.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

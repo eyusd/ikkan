@@ -1,8 +1,30 @@
-import { IkkanHandlerParams, JsonValue, methodHandler, NextHTTPMethod } from "@ikkan/core";
+import {
+  IkkanHandlerParams,
+  JsonValue,
+  methodHandler,
+  NextHTTPMethod,
+} from "@ikkan/core";
 import { z } from "zod";
 import { WaterfallFunction } from "./types";
-import { ikkanClientBridgeBodyParamsWithState, ikkanClientBridgeSearchParamsWithState } from "./bridgeWithState";
-import { ikkanClientBridgeBodyParamsNoState, ikkanClientBridgeSearchParamsNoState } from "./bridgeNoState";
+import {
+  ikkanClientBridgeBodyParamsWithState,
+  ikkanClientBridgeSearchParamsWithState,
+  IkkanClientBridgeWithStateHook,
+} from "./bridgeWithState";
+import {
+  ikkanClientBridgeBodyParamsNoState,
+  IkkanClientBridgeNoStateHook,
+  ikkanClientBridgeSearchParamsNoState,
+} from "./bridgeNoState";
+
+type IkkanClientBridgeHook<
+  Endpoint extends string,
+  Method extends NextHTTPMethod,
+  Output extends JsonValue,
+  Schema extends z.ZodType | undefined = undefined,
+> =
+  | IkkanClientBridgeWithStateHook<Endpoint, Output, Schema>
+  | IkkanClientBridgeNoStateHook<Endpoint, Method, Output, Schema>;
 
 export function ikkanClientBridge<
   Endpoint extends string,
@@ -15,8 +37,8 @@ export function ikkanClientBridge<
   state: boolean,
   waterfall: {
     [K in keyof Mut]: WaterfallFunction<Mut[K][0], Output, Mut[K][1]>;
-  }
-) {
+  },
+): IkkanClientBridgeHook<Endpoint, Method, Output, Schema> {
   const { method } = params;
 
   if (state) {
@@ -30,5 +52,4 @@ export function ikkanClientBridge<
       search: ikkanClientBridgeSearchParamsNoState(params, waterfall),
     });
   }
-
 }

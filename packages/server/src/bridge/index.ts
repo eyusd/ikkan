@@ -1,4 +1,9 @@
-import { IkkanHandlerParams, JsonValue, methodHandler, NextHTTPMethod } from "@ikkan/core";
+import {
+  IkkanHandlerParams,
+  JsonValue,
+  methodHandler,
+  NextHTTPMethod,
+} from "@ikkan/core";
 import { z } from "zod";
 import { ikkanServerBridgeBodyParams } from "./bridgeBodyParams";
 import { ikkanServerBridgeSearchParams } from "./bridgeSearchParams";
@@ -8,9 +13,9 @@ export function ikkanServerBridge<
   Endpoint extends string,
   Method extends NextHTTPMethod,
   Output extends JsonValue,
-  Schema extends z.ZodType | undefined = undefined
+  Schema extends z.ZodType | undefined = undefined,
 >(
-  params: IkkanHandlerParams<Method, Output, Schema>
+  params: IkkanHandlerParams<Method, Output, Schema>,
 ): IkkanServerBridgeHandler<Endpoint, Output, Schema> {
   const { method } = params;
 

@@ -1,4 +1,9 @@
-import { IkkanHandlerParams, JsonValue, makeFetcherSearchParams, NextHTTPMethod } from "@ikkan/core";
+import {
+  IkkanHandlerParams,
+  JsonValue,
+  makeFetcherSearchParams,
+  NextHTTPMethod,
+} from "@ikkan/core";
 import { z } from "zod";
 import { WaterfallFunction } from "../types";
 import { makeOperator } from "../utils";
@@ -14,7 +19,7 @@ export function ikkanClientBridgeSearchParamsNoState<
   { method }: IkkanHandlerParams<Method, Output, Schema>,
   waterfall: {
     [K in keyof Mut]: WaterfallFunction<Mut[K][0], Output, Mut[K][1]>;
-  }
+  },
 ): IkkanClientBridgeNoStateHook<Endpoint, Method, Output, Schema> {
   const fetcher = makeFetcherSearchParams<Endpoint, Method, Output, Schema>(
     method,
@@ -27,6 +32,8 @@ export function ikkanClientBridgeSearchParamsNoState<
       waterfall,
     );
 
-    return { [method]: operator } as ReturnType<IkkanClientBridgeNoStateHook<Endpoint, Method, Output, Schema>>;
+    return { [method]: operator } as ReturnType<
+      IkkanClientBridgeNoStateHook<Endpoint, Method, Output, Schema>
+    >;
   };
 }

@@ -10,8 +10,8 @@ export type IkkanClientBridgeWithStateHook<
   params: Schema extends undefined
     ? undefined
     : z.infer<Exclude<Schema, undefined>>,
-  options?: RequestInit
+  options?: RequestInit,
 ) => {
   data: Output | undefined;
-  error: SerializedAPIError | undefined
-}
+  error: SerializedAPIError | undefined;
+};

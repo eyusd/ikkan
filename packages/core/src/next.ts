@@ -4,9 +4,7 @@ import { SerializedAPIError } from "./errors";
 export type NextHTTPMethodWithBody = "POST" | "PUT" | "PATCH";
 export type NextHTTPMethodWithSearchParams =
   // No support for HEAD
-  | "GET"
-  | "DELETE"
-  | "OPTIONS";
+  "GET" | "DELETE" | "OPTIONS";
 export type NextHTTPMethod =
   | NextHTTPMethodWithBody
   | NextHTTPMethodWithSearchParams;
@@ -19,7 +17,7 @@ export function methodHandler<HandlerType>(
   handlers: {
     body: HandlerType;
     search: HandlerType;
-  }
+  },
 ) {
   if (METHODS_BODY_PARAMS.includes(method)) {
     return handlers.body;
@@ -37,5 +35,5 @@ export interface NextRouteContext {
 }
 export type NextHandler<Output> = (
   req: NextRequest,
-  context?: NextRouteContext
+  context?: NextRouteContext,
 ) => Promise<NextResponse<Output | SerializedAPIError>>;

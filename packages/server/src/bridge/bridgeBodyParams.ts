@@ -10,10 +10,10 @@ export function ikkanServerBridgeBodyParams<
   Method extends NextHTTPMethod,
   Endpoint extends string,
   Output extends JsonValue,
-  Schema extends z.ZodType | undefined = undefined
+  Schema extends z.ZodType | undefined = undefined,
 >({ method }: IkkanHandlerParams<Method, Output, Schema>) {
   const fetcher = makeFetcherBodyParams<Endpoint, Method, Output, Schema>(
-    method
+    method,
   );
 
   return fetcher;

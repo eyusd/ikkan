@@ -12,24 +12,24 @@ import {
 
 type IkkanHandlerExport<
   Method extends NextHTTPMethod,
-  Output extends JsonValue
+  Output extends JsonValue,
 > = Record<Method, NextHandler<Output>>;
 
 export function ikkanHandler<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
-  Schema extends z.ZodType | undefined = undefined
+  Schema extends z.ZodType | undefined = undefined,
 >(
-  params: IkkanHandlerParams<Method, Output, Schema>
+  params: IkkanHandlerParams<Method, Output, Schema>,
 ): IkkanHandlerExport<Method, Output> {
   const { method, ...rest } = params;
 
   const handler = methodHandler(method, {
     body: ikkanHandlerBodyParams(
-      rest as unknown as IkkanMethodHandlerParams<Output, Schema>
+      rest as unknown as IkkanMethodHandlerParams<Output, Schema>,
     ),
     search: ikkanHandlerSearchParams(
-      rest as unknown as IkkanMethodHandlerParams<Output, Schema>
+      rest as unknown as IkkanMethodHandlerParams<Output, Schema>,
     ),
   });
 

@@ -19,15 +19,15 @@ export function ikkanClientBridgeBodyParamsWithState<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
   Schema extends z.ZodType | undefined = undefined,
-  Mut extends [string, unknown][] = []
+  Mut extends [string, unknown][] = [],
 >(
   { method }: IkkanHandlerParams<Method, Output, Schema>,
   waterfall: {
     [K in keyof Mut]: WaterfallFunction<Mut[K][0], Output, Mut[K][1]>;
-  }
+  },
 ): IkkanClientBridgeWithStateHook<Endpoint, Output, Schema> {
   const fetcher = makeFetcherBodyParams<Endpoint, Method, Output, Schema>(
-    method
+    method,
   );
 
   return (
@@ -35,17 +35,18 @@ export function ikkanClientBridgeBodyParamsWithState<
     params: Schema extends undefined
       ? undefined
       : z.infer<Exclude<Schema, undefined>>,
-    options?: RequestInit
+    options?: RequestInit,
   ) => {
     const operator = makeOperator<Endpoint, Output, Schema, Mut>(
       url as unknown as Endpoint,
       fetcher,
       waterfall,
     );
-    const partialOperator = (_url: Endpoint | null) => operator(params, options);
+    const partialOperator = (_url: Endpoint | null) =>
+      operator(params, options);
 
     const [error, setError] = useState<SerializedAPIError | undefined>(
-      undefined
+      undefined,
     );
     const { data } = useSWR<Output, unknown>(url, partialOperator, {
       onError: (error) => {
