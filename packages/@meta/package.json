@@ -1,0 +1,21 @@
+{
+  "name": "ikkan",
+  "version": "1.1.0",
+  "description": "Meta-package for the Ikkan framework",
+  "keywords": [
+    "ikkan",
+    "framework"
+  ],
+  "author": "eyusd",
+  "license": "MIT",
+  "dependencies": {
+    "@ikkan/core": "^1.1.0",
+    "@ikkan/client": "^1.1.0",
+    "@ikkan/server": "^1.1.0"
+  },
+  "peerDependencies": {
+    "@ikkan/core": "^1.1.0",
+    "@ikkan/client": "^1.1.0",
+    "@ikkan/server": "^1.1.0"
+  }
+}

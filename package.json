@@ -13,7 +13,7 @@
     "clean": "turbo run clean",
     "test": "turbo run test",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "publish-packages": "turbo run build lint test && changeset publish"
+    "publish-packages": "node generate-meta.js && turbo run build && changeset publish"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.11",
