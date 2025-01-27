@@ -15,6 +15,16 @@ type IkkanHandlerExport<
   Output extends JsonValue,
 > = Record<Method, NextHandler<Output>>;
 
+/**
+ * Handles the creation of an Ikkan handler for a specific HTTP method.
+ *
+ * @template Method - The HTTP method type (e.g., GET, POST).
+ * @template Output - The expected JSON output type.
+ * @template Schema - The optional Zod schema type for validation.
+ *
+ * @param {IkkanHandlerParams<Method, Output, Schema>} params - The parameters for the Ikkan handler.
+ * @returns {IkkanHandlerExport<Method, Output>} - An object containing the handler for the specified method.
+ */
 export function ikkanHandler<
   Method extends NextHTTPMethod,
   Output extends JsonValue,

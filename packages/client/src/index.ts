@@ -26,6 +26,20 @@ type IkkanClientBridgeHook<
   | IkkanClientBridgeWithStateHook<Endpoint, Output, Schema>
   | IkkanClientBridgeNoStateHook<Endpoint, Method, Output, Schema>;
 
+/**
+ * Creates a client bridge for handling HTTP requests with optional state and waterfall functions.
+ *
+ * @template Endpoint - The endpoint string.
+ * @template Method - The HTTP method type.
+ * @template Output - The expected output type.
+ * @template Schema - The optional Zod schema type for validation.
+ * @template Mut - The mutation array type.
+ *
+ * @param {IkkanHandlerParams<Method, Output, Schema>} params - The handler parameters including method, body, and search params.
+ * @param {boolean} state - A boolean indicating whether to include state in the request.
+ * @param {Object} waterfall - An object containing waterfall functions for mutating the request.
+ * @returns {IkkanClientBridgeHook<Endpoint, Method, Output, Schema>} - The client bridge hook for the specified endpoint and method.
+ */
 export function ikkanClientBridge<
   Endpoint extends string,
   Method extends NextHTTPMethod,
