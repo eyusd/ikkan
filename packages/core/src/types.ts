@@ -30,10 +30,18 @@ export type IkkanMethodHandlerParams<
 > = Schema extends z.ZodType
   ? IkkanMethodHandlerParamsWithSchema<Output, Exclude<Schema, undefined>>
   : IkkanMethodHandlerParamsWithoutSchema<Output>;
-export type IkkanHandlerParams<
+export type IkkanServerHandlerParams<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
   Schema extends z.ZodType | undefined = undefined,
 > = {
   method: Method;
 } & IkkanMethodHandlerParams<Output, Schema>;
+export type IkkanHandlerParams<
+  EndpointGenerator extends (...args: unknown[]) => string,
+  Method extends NextHTTPMethod,
+  Output extends JsonValue,
+  Schema extends z.ZodType | undefined = undefined,
+> = {
+  endpoint: EndpointGenerator;
+} & IkkanServerHandlerParams<Method, Output, Schema>;

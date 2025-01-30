@@ -25,11 +25,6 @@ const generateMetaPackage = () => {
       "@ikkan/core": `^${coreVersion}`,
       "@ikkan/client": `^${clientVersion}`,
       "@ikkan/server": `^${serverVersion}`
-    },
-    peerDependencies: {
-      "@ikkan/core": `^${coreVersion}`,
-      "@ikkan/client": `^${clientVersion}`,
-      "@ikkan/server": `^${serverVersion}`
     }
   };
 

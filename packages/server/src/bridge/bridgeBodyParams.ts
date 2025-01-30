@@ -1,20 +1,30 @@
+import { Fetcher } from "@ikkan/core";
 import {
   IkkanHandlerParams,
   JsonValue,
+  makeFetcherNoSchema,
   makeFetcherBodyParams,
   NextHTTPMethod,
 } from "@ikkan/core";
 import { z } from "zod";
 
 export function ikkanServerBridgeBodyParams<
+  Endpoint extends (...args: unknown[]) => string,
   Method extends NextHTTPMethod,
-  Endpoint extends string,
   Output extends JsonValue,
   Schema extends z.ZodType | undefined = undefined,
->({ method }: IkkanHandlerParams<Method, Output, Schema>) {
-  const fetcher = makeFetcherBodyParams<Endpoint, Method, Output, Schema>(
-    method,
-  );
+>(params: IkkanHandlerParams<Endpoint, Method, Output, Schema>) {
+  const { endpoint, method } = params;
 
-  return fetcher;
+  if ("schema" in params) {
+    return makeFetcherBodyParams<Endpoint, Method, Output, Schema & z.ZodType>(
+      endpoint,
+      method,
+    );
+  } else {
+    return makeFetcherNoSchema<Endpoint, Method, Output, Schema & undefined>(
+      endpoint,
+      method,
+    );
+  }
 }
