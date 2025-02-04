@@ -1,36 +1,27 @@
 import { IkkanHandlerParams, JsonValue, NextHTTPMethod } from "@ikkan/core";
 import { z } from "zod";
-import { WaterfallFunction } from "./types";
-import { IkkanClientBridgeWithStateHook } from "./bridgeWithState/types";
-import { IkkanClientBridgeNoStateHook } from "./bridgeNoState/types";
+import { IkkanClientBridgeHandler, WaterfallFunction } from "./types";
 import { ikkanBridgeWithState } from "./bridgeWithState";
 import { ikkanBridgeNoState } from "./bridgeNoState";
 
-type IkkanClientBridgeHook<
-  EndpointGenerator extends (...args: unknown[]) => string,
-  Method extends NextHTTPMethod,
-  Output extends JsonValue,
-  Schema extends z.ZodType | undefined = undefined,
-> =
-  | IkkanClientBridgeWithStateHook<EndpointGenerator, Output, Schema>
-  | IkkanClientBridgeNoStateHook<EndpointGenerator, Method, Output, Schema>;
 
 export function ikkanClientBridge<
-  EndpointGenerator extends (...args: unknown[]) => string,
   Method extends NextHTTPMethod,
   Output extends JsonValue,
-  Schema extends z.ZodType | undefined = undefined,
-  Mut extends [string, unknown][] = [],
+  Schema extends z.ZodType | undefined,
+  EndpointArgs extends Record<string, string | string[]> | undefined,
+  Mut extends [string, unknown][],
+  UseState extends boolean,
 >(
-  params: IkkanHandlerParams<EndpointGenerator, Method, Output, Schema>,
-  state: boolean,
+  params: IkkanHandlerParams<Method, Output, Schema, EndpointArgs>,
+  state: UseState,
   waterfall: {
     [K in keyof Mut]: WaterfallFunction<Mut[K][0], Output, Mut[K][1]>;
-  },
-): IkkanClientBridgeHook<EndpointGenerator, Method, Output, Schema> {
+  } = {} as any,
+): IkkanClientBridgeHandler<Method, Output, Schema, EndpointArgs, UseState> {
   if (state) {
-    return ikkanBridgeWithState(params, waterfall);
+    return ikkanBridgeWithState(params, waterfall) as IkkanClientBridgeHandler<Method, Output, Schema, EndpointArgs, UseState>;
   } else {
-    return ikkanBridgeNoState(params, waterfall);
+    return ikkanBridgeNoState(params, waterfall)  as IkkanClientBridgeHandler<Method, Output, Schema, EndpointArgs, UseState>;
   }
 }

@@ -2,13 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { handleError } from "@/handler/utils";
 import {
-  IkkanMethodHandlerParams,
+  IkkanHandlerParams,
   JsonValue,
   makeCommonError,
   NextHandler,
+  NextHTTPMethod,
 } from "@ikkan/core";
 
-export async function parseBodyGuard<T extends z.ZodType>(
+async function parseBodyGuard<T extends z.ZodType>(
   req: NextRequest,
   schema: T,
 ): Promise<z.infer<T>> {
@@ -23,26 +24,20 @@ export async function parseBodyGuard<T extends z.ZodType>(
 }
 
 export function ikkanHandlerBodyParams<
-  Output extends JsonValue | void = void,
-  Schema extends z.ZodType | undefined = undefined,
->(params: IkkanMethodHandlerParams<Output, Schema>): NextHandler<Output> {
-  if ("schema" in params) {
-    const { schema, fn } = params;
-    return async (req, context) => {
-      try {
-        const params = await parseBodyGuard(req, schema);
-        return NextResponse.json<Output>(await fn(req, params, context), {
-          status: 200,
-        });
-      } catch (error) {
-        return handleError(error);
-      }
-    };
-  }
+  Method extends NextHTTPMethod,
+  Output extends JsonValue,
+  Schema extends z.ZodType,
+  EndpointArgs extends Record<string, string | string[]> | undefined,
+>(
+  params: IkkanHandlerParams<Method, Output, Schema, EndpointArgs>,
+): NextHandler<Output> {
+  const { schema, fn } = params;
   return async (req, context) => {
-    const { fn } = params;
     try {
-      return NextResponse.json(await fn(req, context), { status: 200 });
+      const params = await parseBodyGuard(req, schema);
+      return NextResponse.json(await fn(req, params, context), {
+        status: 200,
+      });
     } catch (error) {
       return handleError(error);
     }

@@ -34,16 +34,16 @@ export const isSerializedAPIError = (
   );
 };
 
-const COMMON_ERRORS = {
-  invalidParams: new APIError("Invalid parameters", 400),
-  requestError: new APIError("Request error", 400),
-  internalServerError: new APIError("Internal server error", 500),
-};
 export function makeCommonError(
-  type: keyof typeof COMMON_ERRORS,
+  type: "invalidParams" | "requestError" | "internalServerError",
   data: unknown,
 ) {
-  const error = COMMON_ERRORS[type];
-  error.data = data;
-  return error;
+  switch (type) {
+    case "invalidParams":
+      return new APIError("Invalid parameters", 400, data);
+    case "requestError":
+      return new APIError("Request error", 400, data);
+    case "internalServerError":
+      return new APIError("Internal server error", 500, data);
+  }
 }

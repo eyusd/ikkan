@@ -1,8 +1,9 @@
 import { z } from "zod";
 import { NextHTTPMethod } from "../next";
-import { JsonValue } from "../types";
+import { EndpointGenerator, JsonValue } from "../types";
 import { isSerializedAPIError, makeCommonError } from "../errors";
-import { Fetcher } from "./types";
+import { Fetcher, FetcherParams } from "./types";
+import { completeRelativeUrl } from "./utils";
 
 const fetcher = <T>(
   method: NextHTTPMethod,
@@ -11,9 +12,11 @@ const fetcher = <T>(
   options?: RequestInit,
 ) =>
   fetch(
-    params
-      ? `${url}?params=${encodeURIComponent(JSON.stringify(params))}`
-      : url,
+    completeRelativeUrl(
+      params
+        ? `${url}?params=${encodeURIComponent(JSON.stringify(params))}`
+        : url,
+    ),
     {
       method,
       // Options should be overriding, in case of special trickery
@@ -31,40 +34,40 @@ const fetcher = <T>(
       throw makeCommonError("requestError", error).toJSON();
     });
 
-export function makeFetcherSearchParams<
-  EndpointGenerator extends (...args: unknown[]) => string,
+export function makeFetcherSearchParamsNoEndpoint<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
   Schema extends z.ZodType,
+  EndpointArgs extends undefined,
 >(
-  endpointGenerator: EndpointGenerator,
+  endpointGenerator: EndpointGenerator<EndpointArgs>,
   method: Method,
-): Fetcher<EndpointGenerator, Output, Schema> {
-  const argCount = endpointGenerator.length;
-  if (argCount === 0) {
-    return async function fetcherSearch(
-      ...args: [
-        params: z.infer<Exclude<Schema, undefined>>,
-        options?: RequestInit,
-      ]
-    ): Promise<Output> {
-      const url = endpointGenerator();
-      const [params, options] = args;
+): Fetcher<Output, Schema, EndpointArgs> {
+  return async function fetcherSearch(
+    ...args: FetcherParams<Schema, EndpointArgs>
+  ): Promise<Output> {
+    const url = endpointGenerator();
+    const [params, options] = args;
 
-      return await fetcher(method, url, params, options);
-    } as Fetcher<EndpointGenerator, Output, Schema>;
-  } else {
-    return async function fetcherSearch(
-      ...args: [
-        endpointGeneratorArgs: Parameters<EndpointGenerator>,
-        params: z.infer<Exclude<Schema, undefined>>,
-        options?: RequestInit,
-      ]
-    ): Promise<Output> {
-      const [endpointGeneratorArgs, params, options] = args;
-      const url = endpointGenerator(...endpointGeneratorArgs);
+    return await fetcher(method, url, params, options);
+  } as Fetcher<Output, Schema, EndpointArgs>;
+}
 
-      return await fetcher(method, url, params, options);
-    } as Fetcher<EndpointGenerator, Output, Schema>;
-  }
+export function makeFetcherSearchParamsWithEndpoint<
+  Method extends NextHTTPMethod,
+  Output extends JsonValue,
+  Schema extends z.ZodType,
+  EndpointArgs extends Record<string, string | string[]>,
+>(
+  endpointGenerator: EndpointGenerator<EndpointArgs>,
+  method: Method,
+): Fetcher<Output, Schema, EndpointArgs> {
+  return async function fetcherSearch(
+    ...args: FetcherParams<Schema, EndpointArgs>
+  ): Promise<Output> {
+    const [endpointGeneratorArgs, params, options] = args;
+    const url = endpointGenerator(endpointGeneratorArgs);
+
+    return await fetcher(method, url, params, options);
+  } as Fetcher<Output, Schema, EndpointArgs>;
 }

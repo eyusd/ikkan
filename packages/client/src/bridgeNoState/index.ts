@@ -1,88 +1,37 @@
 import {
+  branchHandler,
   IkkanHandlerParams,
   JsonValue,
-  methodHandler,
   NextHTTPMethod,
 } from "@ikkan/core";
 import { WaterfallFunction } from "../types";
 import { z } from "zod";
 import { IkkanClientBridgeNoStateHook } from "./types";
-import { bridgeBodyParams } from "./bridgeBodyParams";
-import { bridgeSearchParams } from "./bridgeSearchParams";
-import { bridgeNoSchema } from "./bridgeNoSchema";
+import { bridgeNoSchemaNoEndpoint, bridgeNoSchemaWithEndpoint } from "./bridgeNoSchema";
+import { bridgeBodyParamsNoEndpoint, bridgeBodyParamsWithEndpoint } from "./bridgeBodyParams";
+import { bridgeSearchParamsNoEndpoint, bridgeSearchParamsWithEndpoint } from "./bridgeSearchParams";
 
+export { type IkkanClientBridgeNoStateHook } from "./types";
 export function ikkanBridgeNoState<
-  EndpointGenerator extends (...args: unknown[]) => string,
   Method extends NextHTTPMethod,
   Output extends JsonValue,
-  Schema extends z.ZodType | undefined = undefined,
-  Mut extends [string, unknown][] = [],
+  Schema extends z.ZodType | undefined,
+  EndpointArgs extends Record<string, string | string[]> | undefined,
+  Mut extends [string, unknown][],
 >(
-  params: IkkanHandlerParams<EndpointGenerator, Method, Output, Schema>,
+  params: IkkanHandlerParams<Method, Output, Schema, EndpointArgs>,
   waterfall: {
     [K in keyof Mut]: WaterfallFunction<Mut[K][0], Output, Mut[K][1]>;
   },
-): IkkanClientBridgeNoStateHook<EndpointGenerator, Method, Output, Schema> {
-  const { method } = params;
+): IkkanClientBridgeNoStateHook<Method, Output, Schema, EndpointArgs> {
+  const handler = branchHandler(params, [waterfall], {
+    noSchemaNoEndpoint: bridgeNoSchemaNoEndpoint,
+    noSchemaWithEndpoint: bridgeNoSchemaWithEndpoint,
+    bodyParamsNoEndpoint: bridgeBodyParamsNoEndpoint,
+    bodyParamsWithEndpoint: bridgeBodyParamsWithEndpoint,
+    searchParamsNoEndpoint: bridgeSearchParamsNoEndpoint,
+    searchParamsWithEndpoint: bridgeSearchParamsWithEndpoint
+  })
 
-  if ("schema" in params) {
-    return methodHandler(method, {
-      body: bridgeBodyParams<
-        EndpointGenerator,
-        Method,
-        Output,
-        Schema & z.ZodType,
-        Mut
-      >(
-        params as IkkanHandlerParams<
-          EndpointGenerator,
-          Method,
-          Output,
-          Schema & z.ZodType
-        >,
-        waterfall,
-      ),
-      search: bridgeSearchParams<
-        EndpointGenerator,
-        Method,
-        Output,
-        Schema & z.ZodType,
-        Mut
-      >(
-        params as IkkanHandlerParams<
-          EndpointGenerator,
-          Method,
-          Output,
-          Schema & z.ZodType
-        >,
-        waterfall,
-      ),
-    }) as IkkanClientBridgeNoStateHook<
-      EndpointGenerator,
-      Method,
-      Output,
-      Schema
-    >;
-  } else {
-    return bridgeNoSchema<
-      EndpointGenerator,
-      Method,
-      Output,
-      Schema & undefined,
-      Mut
-    >(
-      params as IkkanHandlerParams<
-        EndpointGenerator,
-        Method,
-        Output,
-        Schema & undefined
-      >,
-      waterfall,
-    ) as IkkanClientBridgeNoStateHook<
-      EndpointGenerator,
-      Method,
-      Output,
-      Schema
-    >;
-  }
+  return handler as IkkanClientBridgeNoStateHook<Method, Output, Schema, EndpointArgs>;
 }

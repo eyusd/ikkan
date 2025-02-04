@@ -1,10 +1,15 @@
 import { NextHTTPMethod } from "../next";
-import { JsonValue } from "../types";
+import { EndpointGenerator, JsonValue } from "../types";
 import { isSerializedAPIError, makeCommonError } from "../errors";
 import { Fetcher } from "./types";
+import { completeRelativeUrl } from "./utils";
 
-const fetcher = (method: NextHTTPMethod, url: string, options?: RequestInit) =>
-  fetch(url, {
+const fetcher = <Output extends JsonValue>(
+  method: NextHTTPMethod,
+  url: string,
+  options?: RequestInit,
+): Promise<Output> =>
+  fetch(completeRelativeUrl(url), {
     method,
     // Options should be overriding, in case of special trickery
     ...options,
@@ -20,36 +25,40 @@ const fetcher = (method: NextHTTPMethod, url: string, options?: RequestInit) =>
       throw makeCommonError("requestError", error).toJSON();
     });
 
-export function makeFetcherNoSchema<
-  EndpointGenerator extends (...args: unknown[]) => string,
+export function makeFetcherNoSchemaNoEndpoint<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
   Schema extends undefined,
+  EndpointArgs extends undefined,
 >(
-  endpointGenerator: EndpointGenerator,
+  endpointGenerator: EndpointGenerator<EndpointArgs>,
   method: Method,
-): Fetcher<EndpointGenerator, Output, Schema> {
-  const argCount = endpointGenerator.length;
-  if (argCount === 0) {
-    return async function fetcherNoSchema(
-      ...args: [options?: RequestInit]
-    ): Promise<Output> {
-      const url = endpointGenerator();
-      const [options] = args;
+): Fetcher<Output, Schema, EndpointArgs> {
+  return async function fetcherNoSchema(
+    ...args: [options?: RequestInit]
+  ): Promise<Output> {
+    const url = endpointGenerator();
+    const [options] = args;
 
-      return await fetcher(method, url, options);
-    } as Fetcher<EndpointGenerator, Output, Schema>;
-  } else {
-    return async function fetcherNoSchema(
-      ...args: [
-        endpointGeneratorArgs: Parameters<EndpointGenerator>,
-        options?: RequestInit,
-      ]
-    ): Promise<Output> {
-      const [endpointGeneratorArgs, options] = args;
-      const url = endpointGenerator(...endpointGeneratorArgs);
+    return await fetcher<Output>(method, url, options);
+  } as Fetcher<Output, Schema, EndpointArgs>;
+}
 
-      return await fetcher(method, url, options);
-    } as Fetcher<EndpointGenerator, Output, Schema>;
-  }
+export function makeFetcherNoSchemaWithEndpoint<
+  Method extends NextHTTPMethod,
+  Output extends JsonValue,
+  Schema extends undefined,
+  EndpointArgs extends Record<string, string | string[]>,
+>(
+  endpointGenerator: EndpointGenerator<EndpointArgs>,
+  method: Method,
+): Fetcher<Output, Schema, EndpointArgs> {
+  return async function fetcherNoSchema(
+    ...args: [endpointGeneratorArgs: EndpointArgs, options?: RequestInit]
+  ): Promise<Output> {
+    const [endpointGeneratorArgs, options] = args;
+    const url = endpointGenerator(endpointGeneratorArgs);
+
+    return await fetcher<Output>(method, url, options);
+  } as Fetcher<Output, Schema, EndpointArgs>;
 }

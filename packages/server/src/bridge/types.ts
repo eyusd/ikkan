@@ -3,7 +3,11 @@ import { JsonValue } from "@ikkan/core";
 import { z } from "zod";
 
 export type IkkanServerBridgeHandler<
-  Endpoint extends (...args: unknown[]) => string,
   Output extends JsonValue,
-  Schema extends z.ZodType | undefined = undefined,
-> = Fetcher<Endpoint, Output, Schema>;
+  Schema extends z.ZodType | undefined,
+  EndpointArgs extends Record<string, string | string[]> | undefined,
+> = (
+    ...args: EndpointArgs extends Record<string, string | string[]>
+      ? [EndpointArgs]
+      : []
+  ) => Fetcher<Output, Schema, undefined>;

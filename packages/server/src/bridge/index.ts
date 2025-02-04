@@ -1,26 +1,40 @@
 import {
+  branchHandler,
   IkkanHandlerParams,
   JsonValue,
-  methodHandler,
   NextHTTPMethod,
 } from "@ikkan/core";
 import { z } from "zod";
-import { ikkanServerBridgeBodyParams } from "./bridgeBodyParams";
-import { ikkanServerBridgeSearchParams } from "./bridgeSearchParams";
 import { IkkanServerBridgeHandler } from "./types";
+import {
+  ikkanServerBridgeNoSchemaNoEndpoint,
+  ikkanServerBridgeNoSchemaWithEndpoint,
+} from "./bridgeNoSchema";
+import {
+  ikkanServerBridgeBodyParamsNoEndpoint,
+  ikkanServerBridgeBodyParamsWithEndpoint,
+} from "./bridgeBodyParams";
+import {
+  ikkanServerBridgeSearchParamsNoEndpoint,
+  ikkanServerBridgeSearchParamsWithEndpoint,
+} from "./bridgeSearchParams";
 
 export function ikkanServerBridge<
-  Endpoint extends (...args: unknown[]) => string,
   Method extends NextHTTPMethod,
   Output extends JsonValue,
-  Schema extends z.ZodType | undefined = undefined,
+  Schema extends z.ZodType | undefined,
+  EndpointArgs extends Record<string, string | string[]> | undefined,
 >(
-  params: IkkanHandlerParams<Endpoint, Method, Output, Schema>,
-): IkkanServerBridgeHandler<Endpoint, Output, Schema> {
-  const { method } = params;
+  params: IkkanHandlerParams<Method, Output, Schema, EndpointArgs>
+): IkkanServerBridgeHandler<Output, Schema, EndpointArgs> {
+  const handler = branchHandler(params, [], {
+    noSchemaNoEndpoint: ikkanServerBridgeNoSchemaNoEndpoint,
+    noSchemaWithEndpoint: ikkanServerBridgeNoSchemaWithEndpoint,
+    bodyParamsNoEndpoint: ikkanServerBridgeBodyParamsNoEndpoint,
+    bodyParamsWithEndpoint: ikkanServerBridgeBodyParamsWithEndpoint,
+    searchParamsNoEndpoint: ikkanServerBridgeSearchParamsNoEndpoint,
+    searchParamsWithEndpoint: ikkanServerBridgeSearchParamsWithEndpoint,
+  });
 
-  return methodHandler(method, {
-    body: ikkanServerBridgeBodyParams(params),
-    search: ikkanServerBridgeSearchParams(params),
-  }) as IkkanServerBridgeHandler<Endpoint, Output, Schema>;
+  return handler as IkkanServerBridgeHandler<Output, Schema, EndpointArgs>;
 }

@@ -9,9 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@ikkan/client": "^2.0.0",
-    "@ikkan/core": "^2.0.0",
-    "@ikkan/server": "^2.0.0",
+    "@ikkan/client": "workspace:*",
+    "@ikkan/core": "workspace:*",
+    "@ikkan/server": "workspace:*",
     "@prisma/client": "^6.2.1",
     "@radix-ui/react-avatar": "^1.1.2",
     "@radix-ui/react-dialog": "^1.1.5",

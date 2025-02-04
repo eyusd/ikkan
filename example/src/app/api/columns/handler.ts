@@ -1,10 +1,9 @@
-import { IkkanHandlerParams } from "@ikkan/core";
 import { prisma } from "@/lib/prisma";
 
 export const handler = {
-  method: "GET",
+  endpoint: () => `/api/columns`,
+  method: "GET" as const,
   fn: async () => {
-    const columns = await prisma.column.findMany();
-    return columns.map((column) => column.id);
+    return await prisma.column.findMany();
   },
-} as const;
+};

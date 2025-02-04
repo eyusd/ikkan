@@ -1,11 +1,19 @@
-import { FetcherParams, JsonValue, SerializedAPIError } from "@ikkan/core";
+import {
+  FetcherParams,
+  JsonValue,
+  SerializedAPIError,
+} from "@ikkan/core";
 import { z } from "zod";
 
 export type IkkanClientBridgeWithStateHook<
-  EndpointGenerator extends (...args: unknown[]) => string,
   Output extends JsonValue,
-  Schema extends z.ZodType | undefined = undefined,
-> = (...args: FetcherParams<EndpointGenerator, Schema>) => {
+  Schema extends z.ZodType | undefined,
+  EndpointArgs extends Record<string, string | string[]> | undefined,
+> = (
+  ...args: EndpointArgs extends Record<string, string | string[]>
+    ? [EndpointArgs]
+    : []
+) => (...params: FetcherParams<Schema, undefined>) => {
   data: Output | undefined;
   error: SerializedAPIError | undefined;
 };

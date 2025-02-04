@@ -1,14 +1,18 @@
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal, Plus } from "lucide-react";
 import { Task } from "./task";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
-export function Column() {
+type ColumnProps = {
+  id: number;
+  name: string;
+};
+
+export function Column({ id, name }: ColumnProps) {
   return (
     <div className="flex w-72 flex-col">
       <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <h2 className="font-medium">To do</h2>
+          <h2 className="font-medium">{name}</h2>
           <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs">
             3
           </span>

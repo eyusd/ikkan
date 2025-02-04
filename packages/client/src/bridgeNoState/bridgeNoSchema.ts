@@ -1,43 +1,56 @@
 import {
   IkkanHandlerParams,
   JsonValue,
-  makeFetcherNoSchema,
+  makeFetcherNoSchemaNoEndpoint,
+  makeFetcherNoSchemaWithEndpoint,
   NextHTTPMethod,
 } from "@ikkan/core";
 import { WaterfallFunction } from "../types";
-import { makeWaterfallOperator } from "../utils";
+import { waterfallNoEndpoint, waterfallWithEndpoint } from "../utils";
+import { makeTransform } from "./utils";
 import { IkkanClientBridgeNoStateHook } from "./types";
 
-export function bridgeNoSchema<
-  EndpointGenerator extends (...args: unknown[]) => string,
+export function bridgeNoSchemaNoEndpoint<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
   Schema extends undefined,
-  Mut extends [string, unknown][] = [],
+  EndpointArgs extends undefined,
+  Mut extends [string, unknown][],
 >(
-  params: IkkanHandlerParams<EndpointGenerator, Method, Output, Schema>,
+  params: IkkanHandlerParams<Method, Output, Schema, EndpointArgs>,
   waterfall: {
     [K in keyof Mut]: WaterfallFunction<Mut[K][0], Output, Mut[K][1]>;
   },
-): IkkanClientBridgeNoStateHook<EndpointGenerator, Method, Output, Schema> {
+) {
   const { endpoint, method } = params;
-  const fetcher = makeFetcherNoSchema<
-    EndpointGenerator,
-    Method,
-    Output,
-    Schema
-  >(endpoint, method);
+  const fetcher = makeFetcherNoSchemaNoEndpoint<Method, Output, Schema, EndpointArgs>(
+    endpoint,
+    method,
+  );
+  const transform = makeTransform<Method, Output, Schema>(method)
 
-  return (...args: Parameters<EndpointGenerator>) => {
-    const operator = makeWaterfallOperator<
-      EndpointGenerator,
-      Output,
-      Schema,
-      Mut
-    >(args, fetcher, waterfall);
+  return waterfallNoEndpoint(fetcher, waterfall, transform) as IkkanClientBridgeNoStateHook<Method, Output, Schema, EndpointArgs>
+}
 
-    return { [method]: operator } as ReturnType<
-      IkkanClientBridgeNoStateHook<EndpointGenerator, Method, Output, Schema>
-    >;
-  };
+
+export function bridgeNoSchemaWithEndpoint<
+  Method extends NextHTTPMethod,
+  Output extends JsonValue,
+  Schema extends undefined,
+  EndpointArgs extends Record<string, string | string[]>,
+  Mut extends [string, unknown][],
+>(
+  params: IkkanHandlerParams<Method, Output, Schema, EndpointArgs>,
+  waterfall: {
+    [K in keyof Mut]: WaterfallFunction<Mut[K][0], Output, Mut[K][1]>;
+  },
+) {
+  const { endpoint, method } = params;
+  const fetcher = makeFetcherNoSchemaWithEndpoint<Method, Output, Schema, EndpointArgs>(
+    endpoint,
+    method,
+  );
+  const transform = makeTransform<Method, Output, Schema>(method)
+
+  return waterfallWithEndpoint(fetcher, waterfall, transform) as IkkanClientBridgeNoStateHook<Method, Output, Schema, EndpointArgs>
 }

@@ -1,32 +1,29 @@
 import { z } from "zod";
 import { JsonValue } from "../types";
 
-export type FetcherParamsEmptyEndpoint<Schema extends z.ZodType | undefined> =
-  Schema extends undefined
-    ? [options?: RequestInit]
-    : [params: z.infer<Exclude<Schema, undefined>>, options?: RequestInit];
+type FetcherParamsNoEndpointArgs<
+  Schema extends z.ZodType | undefined = undefined,
+> = Schema extends z.ZodType
+  ? [params: z.infer<Schema>, options?: RequestInit]
+  : [options?: RequestInit];
 
-export type FetcherParamsNonEmptyEndpoint<
-  EndpointGenerator extends (...args: [unknown, ...unknown[]]) => string,
+type FetcherParamsWithEndpointArgs<
   Schema extends z.ZodType | undefined,
-> = Schema extends undefined
-  ? [args: Parameters<EndpointGenerator>, options?: RequestInit]
-  : [
-      args: Parameters<EndpointGenerator>,
-      params: z.infer<Exclude<Schema, undefined>>,
-      options?: RequestInit,
-    ];
+  EndpointArgs extends Record<string, string | string[]>,
+> = Schema extends z.ZodType
+  ? [args: EndpointArgs, params: z.infer<Schema>, options?: RequestInit]
+  : [args: EndpointArgs, options?: RequestInit];
 
 export type FetcherParams<
-  EndpointGenerator extends (...args: unknown[]) => string,
-  Schema extends z.ZodType | undefined = undefined,
+  Schema extends z.ZodType | undefined,
+  EndpointArgs extends Record<string, string | string[]> | undefined,
 > =
-  Parameters<EndpointGenerator> extends []
-    ? FetcherParamsEmptyEndpoint<Schema>
-    : FetcherParamsNonEmptyEndpoint<EndpointGenerator, Schema>;
+  EndpointArgs extends Record<string, string | string[]>
+    ? FetcherParamsWithEndpointArgs<Schema, EndpointArgs>
+    : FetcherParamsNoEndpointArgs<Schema>;
 
 export type Fetcher<
-  EndpointGenerator extends (...args: unknown[]) => string,
   Output extends JsonValue,
-  Schema extends z.ZodType | undefined = undefined,
-> = (...args: FetcherParams<EndpointGenerator, Schema>) => Promise<Output>;
+  Schema extends z.ZodType | undefined,
+  EndpointArgs extends Record<string, string | string[]> | undefined,
+> = (...args: FetcherParams<Schema, EndpointArgs>) => Promise<Output>;

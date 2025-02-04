@@ -1,4 +1,7 @@
 import {
+  EndpointGenerator,
+  Fetcher,
+  FetcherParams,
   isSerializedAPIError,
   JsonValue,
   makeCommonError,
@@ -6,8 +9,9 @@ import {
 } from "@ikkan/core";
 import { useState } from "react";
 import useSWR from "swr";
+import { z } from "zod";
 
-export function stateWrapper<Output extends JsonValue>(
+function stateWrapper<Output extends JsonValue>(
   url: string,
   operator: () => Promise<Output>,
 ) {
@@ -22,4 +26,30 @@ export function stateWrapper<Output extends JsonValue>(
   });
 
   return { data, error };
+}
+
+export function makeTransformNoEndpoint<
+  Output extends JsonValue,
+  Schema extends z.ZodType | undefined,
+  EndpointArgs extends undefined,
+>(endpoint: EndpointGenerator<EndpointArgs>) {
+  return (partializedFetcher: Fetcher<Output, Schema, undefined>) => {
+    const url = endpoint();
+    return function hook(...params: FetcherParams<Schema, undefined>) {
+      return stateWrapper<Output>(url, () => partializedFetcher(...params));
+    }
+  }
+}
+
+export function makeTransformWithEndpoint<
+  Output extends JsonValue,
+  Schema extends z.ZodType | undefined,
+  EndpointArgs extends Record<string, string | string[]>,
+>(endpoint: EndpointGenerator<EndpointArgs>) {
+  return (partializedFetcher: Fetcher<Output, Schema, undefined>, args: EndpointArgs) => {
+    const url = endpoint(args);
+    return function hook(...params: FetcherParams<Schema, undefined>) {
+      return stateWrapper<Output>(url, () => partializedFetcher(...params));
+    }
+  }
 }

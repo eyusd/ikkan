@@ -1,75 +1,57 @@
 import {
-  FetcherParamsEmptyEndpoint,
-  FetcherParamsNonEmptyEndpoint,
   IkkanHandlerParams,
   JsonValue,
-  makeFetcherBodyParams,
+  makeFetcherBodyParamsNoEndpoint,
+  makeFetcherBodyParamsWithEndpoint,
   NextHTTPMethod,
 } from "@ikkan/core";
-import { z } from "zod";
 import { WaterfallFunction } from "../types";
-import { makeWaterfallOperator, WaterfallOperator } from "../utils";
+import {
+  waterfallNoEndpoint,
+  waterfallWithEndpoint,
+} from "../utils";
+import { makeTransformNoEndpoint, makeTransformWithEndpoint } from "./utils";
+import { z } from "zod";
 import { IkkanClientBridgeWithStateHook } from "./types";
-import { stateWrapper } from "./utils";
 
-export function bridgeBodyParams<
-  EndpointGenerator extends (...args: unknown[]) => string,
+export function bridgeBodyParamsNoEndpoint<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
   Schema extends z.ZodType,
-  Mut extends [string, unknown][] = [],
+  EndpointArgs extends undefined,
+  Mut extends [string, unknown][],
 >(
-  params: IkkanHandlerParams<EndpointGenerator, Method, Output, Schema>,
+  params: IkkanHandlerParams<Method, Output, Schema, EndpointArgs>,
   waterfall: {
     [K in keyof Mut]: WaterfallFunction<Mut[K][0], Output, Mut[K][1]>;
   },
-): IkkanClientBridgeWithStateHook<EndpointGenerator, Output, Schema> {
+) {
   const { endpoint, method } = params;
-  const fetcher = makeFetcherBodyParams<
-    EndpointGenerator,
-    Method,
-    Output,
-    Schema & z.ZodType
-  >(endpoint, method);
+  const fetcher = makeFetcherBodyParamsNoEndpoint<Method, Output, Schema, EndpointArgs>(
+    endpoint,
+    method,
+  );
+  const transform = makeTransformNoEndpoint<Output, Schema, EndpointArgs>(endpoint)
+  return waterfallNoEndpoint(fetcher, waterfall, transform) as IkkanClientBridgeWithStateHook<Output, Schema, EndpointArgs>
+}
 
-  if (endpoint.length === 0) {
-    return function hook(...args: FetcherParamsEmptyEndpoint<Schema>) {
-      const operator = makeWaterfallOperator<
-        EndpointGenerator & (() => string),
-        Output,
-        Schema,
-        Mut
-      >(
-        [] as Parameters<EndpointGenerator & (() => string)>,
-        fetcher,
-        waterfall,
-      );
-      const url = endpoint();
-      return stateWrapper<Output>(url, () => operator(...args));
-    } as IkkanClientBridgeWithStateHook<EndpointGenerator, Output, Schema>;
-  } else {
-    return function hook(
-      ...args: FetcherParamsNonEmptyEndpoint<EndpointGenerator, Schema>
-    ) {
-      const [fetcherArgs, ...rest] = args;
-      const operator = makeWaterfallOperator<
-        EndpointGenerator & ((...args: [unknown, ...unknown[]]) => string),
-        Output,
-        Schema,
-        Mut
-      >(
-        fetcherArgs as Parameters<
-          EndpointGenerator & ((...args: [unknown, ...unknown[]]) => string)
-        >,
-        fetcher,
-        waterfall,
-      );
-
-      const url = endpoint(...fetcherArgs);
-
-      return stateWrapper<Output>(url, () =>
-        operator(...(rest as Parameters<WaterfallOperator<Output, Schema>>)),
-      );
-    } as IkkanClientBridgeWithStateHook<EndpointGenerator, Output, Schema>;
-  }
+export function bridgeBodyParamsWithEndpoint<
+  Method extends NextHTTPMethod,
+  Output extends JsonValue,
+  Schema extends z.ZodType,
+  EndpointArgs extends Record<string, string | string[]>,
+  Mut extends [string, unknown][],
+>(
+  params: IkkanHandlerParams<Method, Output, Schema, EndpointArgs>,
+  waterfall: {
+    [K in keyof Mut]: WaterfallFunction<Mut[K][0], Output, Mut[K][1]>;
+  },
+) {
+  const { endpoint, method } = params;
+  const fetcher = makeFetcherBodyParamsWithEndpoint<Method, Output, Schema, EndpointArgs>(
+    endpoint,
+    method,
+  );
+  const transform = makeTransformWithEndpoint<Output, Schema, EndpointArgs>(endpoint)
+  return waterfallWithEndpoint(fetcher, waterfall, transform) as IkkanClientBridgeWithStateHook<Output, Schema, EndpointArgs>
 }

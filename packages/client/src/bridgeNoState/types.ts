@@ -1,12 +1,15 @@
-import { JsonValue, NextHTTPMethod } from "@ikkan/core";
-import { WaterfallOperator } from "../utils";
+import { Fetcher, JsonValue, NextHTTPMethod } from "@ikkan/core";
 import { z } from "zod";
 
 export type IkkanClientBridgeNoStateHook<
-  EndpointGenerator extends (...args: unknown[]) => string,
   Method extends NextHTTPMethod,
   Output extends JsonValue,
-  Schema extends z.ZodType | undefined = undefined,
-> = (...args: Parameters<EndpointGenerator>) => {
-  [key in Method]: WaterfallOperator<Output, Schema>;
+  Schema extends z.ZodType | undefined,
+  EndpointArgs extends Record<string, string | string[]> | undefined,
+> = (
+  ...args: EndpointArgs extends Record<string, string | string[]>
+    ? [EndpointArgs]
+    : []
+) => {
+  [key in Method]: Fetcher<Output, Schema, undefined>;
 };
