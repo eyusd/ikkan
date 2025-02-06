@@ -1,21 +1,32 @@
-import { Fetcher, FetcherParams, JsonValue, makeCommonError } from "@ikkan/core";
+import {
+  IkkanFetcher,
+  IkkanFetcherParams,
+  JsonValue,
+  makeCommonError,
+} from "@ikkan/core";
 import { z } from "zod";
-import { WaterfallFunction } from "./types";
 import { mutate } from "swr";
+import { FullArgs, IkkanSideEffects } from "./sideEffect";
 
-async function cascade<
+// TODO: Refactor this so that waterfall can be created from a series of config + endpoint args + mutator
+async function applySideEffects<
   Output extends JsonValue,
-  Mut extends [string, unknown][],
+  Schema extends z.ZodType | undefined,
+  EndpointArgs extends Record<string, string | string[]> | undefined,
+  T extends JsonValue[],
 >(
-  response: Output,
-  waterfall: {
-    [K in keyof Mut]: WaterfallFunction<Mut[K][0], Output, Mut[K][1]>;
-  },
+  args: FullArgs<Output, Schema, EndpointArgs>,
+  sideEffects: IkkanSideEffects<T, Output, Schema, EndpointArgs>,
 ) {
   await Promise.all(
-    waterfall.map(async (waterfallFunction) => {
-      const { endpoint, mutator } = waterfallFunction(response);
-      return await mutate(endpoint, mutator, {
+    sideEffects.map(async ({ mutator, urlGenerator }) => {
+      const { output } = args;
+      const url = urlGenerator(args);
+      const operator: unknown = (cachedValue: unknown) => {
+        // @ts-expect-error - variadic types are not supported
+        return mutator(cachedValue, output);
+      };
+      return await mutate(url, operator, {
         populateCache: true,
         revalidate: false,
         rollbackOnError: true,
@@ -24,27 +35,28 @@ async function cascade<
   );
 }
 
-
-export function waterfallNoEndpoint<
+export function clientHookNoEndpoint<
   Output extends JsonValue,
   Schema extends z.ZodType | undefined,
-  EndpointArgs extends undefined,
-  Mut extends [string, unknown][],
-  TransformResult
+  T extends JsonValue[],
+  TransformResult,
 >(
-  fetcher: Fetcher<Output, Schema, EndpointArgs>,
-  waterfall: {
-    [K in keyof Mut]: WaterfallFunction<Mut[K][0], Output, Mut[K][1]>;
-  },
-  transform: (partializedFetcher: Fetcher<Output, Schema, undefined>) => TransformResult
+  fetcher: IkkanFetcher<Output, Schema, undefined>,
+  sideEffects: IkkanSideEffects<T, Output, Schema, undefined>,
+  transform: (
+    partializedFetcher: IkkanFetcher<Output, Schema, undefined>,
+  ) => TransformResult,
 ) {
   return () => {
-    const partializedFetcher: Fetcher<Output, Schema, undefined> = async (
-      ...params: FetcherParams<Schema, undefined>
+    const partializedFetcher: IkkanFetcher<Output, Schema, undefined> = async (
+      ...params: IkkanFetcherParams<Schema, undefined>
     ): Promise<Output> => {
       try {
-        const response = await (fetcher as Fetcher<Output, Schema, undefined>)(...params);
-        await cascade(response, waterfall);
+        const response = await (
+          fetcher as IkkanFetcher<Output, Schema, undefined>
+        )(...params);
+        const args = { output: response, ...params } as any;
+        await applySideEffects(args, sideEffects);
         return response;
       } catch (error) {
         throw makeCommonError("requestError", error).toJSON();
@@ -52,36 +64,38 @@ export function waterfallNoEndpoint<
     };
 
     return transform(partializedFetcher);
-  }
+  };
 }
 
-export function waterfallWithEndpoint<
+export function clientHookWithEndpoint<
   Output extends JsonValue,
   Schema extends z.ZodType | undefined,
   EndpointArgs extends Record<string, string | string[]>,
-  Mut extends [string, unknown][],
-  TransformResult
+  T extends JsonValue[],
+  TransformResult,
 >(
-  fetcher: Fetcher<Output, Schema, EndpointArgs>,
-  waterfall: {
-    [K in keyof Mut]: WaterfallFunction<Mut[K][0], Output, Mut[K][1]>;
-  },
-  transform: (partializedFetcher: Fetcher<Output, Schema, undefined>, args: EndpointArgs) => TransformResult
+  fetcher: IkkanFetcher<Output, Schema, EndpointArgs>,
+  sideEffects: IkkanSideEffects<T, Output, Schema, EndpointArgs>,
+  transform: (
+    partializedFetcher: IkkanFetcher<Output, Schema, undefined>,
+    args: EndpointArgs,
+  ) => TransformResult,
 ) {
   return (args: EndpointArgs) => {
-    const partializedFetcher: Fetcher<Output, Schema, undefined> = async (
-      ...params: FetcherParams<Schema, undefined>
+    const partializedFetcher: IkkanFetcher<Output, Schema, undefined> = async (
+      ...params: IkkanFetcherParams<Schema, undefined>
     ): Promise<Output> => {
       try {
-        // @ts-ignore - this is a hack to make the types work
+        // @ts-expect-error - this is a hack to make the types work
         const response = await fetcher(args, ...params);
-        await cascade(response, waterfall);
+        const args = { output: response, ...params } as any;
+        await applySideEffects(args, sideEffects);
         return response;
       } catch (error) {
         throw makeCommonError("requestError", error).toJSON();
       }
-    }
+    };
 
     return transform(partializedFetcher, args);
-  }
+  };
 }

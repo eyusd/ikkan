@@ -12,7 +12,7 @@
     "@ikkan/client": "workspace:*",
     "@ikkan/core": "workspace:*",
     "@ikkan/server": "workspace:*",
-    "@prisma/client": "^6.2.1",
+    "@prisma/client": "^6.3.1",
     "@radix-ui/react-avatar": "^1.1.2",
     "@radix-ui/react-dialog": "^1.1.5",
     "@radix-ui/react-popover": "^1.1.5",
@@ -29,7 +29,8 @@
     "react-day-picker": "^8.10.1",
     "react-dom": "^19.0.0",
     "tailwind-merge": "^2.6.0",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@types/node": "^20",

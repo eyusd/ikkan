@@ -1,6 +1,6 @@
 import {
   branchHandler,
-  IkkanHandlerParams,
+  IkkanConfig,
   JsonValue,
   NextHTTPMethod,
 } from "@ikkan/core";
@@ -25,9 +25,9 @@ export function ikkanServerBridge<
   Schema extends z.ZodType | undefined,
   EndpointArgs extends Record<string, string | string[]> | undefined,
 >(
-  params: IkkanHandlerParams<Method, Output, Schema, EndpointArgs>
+  config: IkkanConfig<Method, Output, Schema, EndpointArgs>,
 ): IkkanServerBridgeHandler<Output, Schema, EndpointArgs> {
-  const handler = branchHandler(params, [], {
+  const handler = branchHandler(config, [], {
     noSchemaNoEndpoint: ikkanServerBridgeNoSchemaNoEndpoint,
     noSchemaWithEndpoint: ikkanServerBridgeNoSchemaWithEndpoint,
     bodyParamsNoEndpoint: ikkanServerBridgeBodyParamsNoEndpoint,

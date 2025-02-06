@@ -1,7 +1,7 @@
 import { NextHTTPMethod } from "../next";
 import { EndpointGenerator, JsonValue } from "../types";
 import { isSerializedAPIError, makeCommonError } from "../errors";
-import { Fetcher } from "./types";
+import { IkkanFetcher, IkkanFetcherParams } from "./types";
 import { completeRelativeUrl } from "./utils";
 
 const fetcher = <Output extends JsonValue>(
@@ -28,37 +28,34 @@ const fetcher = <Output extends JsonValue>(
 export function makeFetcherNoSchemaNoEndpoint<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
-  Schema extends undefined,
-  EndpointArgs extends undefined,
 >(
-  endpointGenerator: EndpointGenerator<EndpointArgs>,
+  endpointGenerator: EndpointGenerator<undefined>,
   method: Method,
-): Fetcher<Output, Schema, EndpointArgs> {
+): IkkanFetcher<Output, undefined, undefined> {
   return async function fetcherNoSchema(
-    ...args: [options?: RequestInit]
+    ...args: IkkanFetcherParams<undefined, undefined>
   ): Promise<Output> {
     const url = endpointGenerator();
     const [options] = args;
 
     return await fetcher<Output>(method, url, options);
-  } as Fetcher<Output, Schema, EndpointArgs>;
+  } as IkkanFetcher<Output, undefined, undefined>;
 }
 
 export function makeFetcherNoSchemaWithEndpoint<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
-  Schema extends undefined,
   EndpointArgs extends Record<string, string | string[]>,
 >(
   endpointGenerator: EndpointGenerator<EndpointArgs>,
   method: Method,
-): Fetcher<Output, Schema, EndpointArgs> {
+): IkkanFetcher<Output, undefined, EndpointArgs> {
   return async function fetcherNoSchema(
-    ...args: [endpointGeneratorArgs: EndpointArgs, options?: RequestInit]
+    ...args: IkkanFetcherParams<undefined, EndpointArgs>
   ): Promise<Output> {
     const [endpointGeneratorArgs, options] = args;
     const url = endpointGenerator(endpointGeneratorArgs);
 
     return await fetcher<Output>(method, url, options);
-  } as Fetcher<Output, Schema, EndpointArgs>;
+  } as IkkanFetcher<Output, undefined, EndpointArgs>;
 }

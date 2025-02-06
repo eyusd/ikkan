@@ -1,16 +1,24 @@
 import {
   branchHandler,
-  IkkanHandlerParams,
+  IkkanConfig,
   JsonValue,
   NextHTTPMethod,
 } from "@ikkan/core";
-import { WaterfallFunction } from "../types";
 import { z } from "zod";
 import { IkkanClientBridgeWithStateHook } from "./types";
-import { bridgeNoSchemaNoEndpoint, bridgeNoSchemaWithEndpoint } from "./bridgeNoSchema";
-import { bridgeBodyParamsNoEndpoint, bridgeBodyParamsWithEndpoint } from "./bridgeBodyParams";
-import { bridgeSearchParamsNoEndpoint, bridgeSearchParamsWithEndpoint } from "./bridgeSearchParams";
-
+import {
+  bridgeNoSchemaNoEndpoint,
+  bridgeNoSchemaWithEndpoint,
+} from "./bridgeNoSchema";
+import {
+  bridgeBodyParamsNoEndpoint,
+  bridgeBodyParamsWithEndpoint,
+} from "./bridgeBodyParams";
+import {
+  bridgeSearchParamsNoEndpoint,
+  bridgeSearchParamsWithEndpoint,
+} from "./bridgeSearchParams";
+import { IkkanSideEffects } from "../sideEffect";
 
 export { type IkkanClientBridgeWithStateHook } from "./types";
 export function ikkanBridgeWithState<
@@ -18,21 +26,23 @@ export function ikkanBridgeWithState<
   Output extends JsonValue,
   Schema extends z.ZodType | undefined,
   EndpointArgs extends Record<string, string | string[]> | undefined,
-  Mut extends [string, unknown][],
+  T extends JsonValue[],
 >(
-  params: IkkanHandlerParams<Method, Output, Schema, EndpointArgs>,
-  waterfall: {
-    [K in keyof Mut]: WaterfallFunction<Mut[K][0], Output, Mut[K][1]>;
-  },
+  config: IkkanConfig<Method, Output, Schema, EndpointArgs>,
+  sideEffects: IkkanSideEffects<T, Output, Schema, EndpointArgs>,
 ): IkkanClientBridgeWithStateHook<Output, Schema, EndpointArgs> {
-  const handler = branchHandler(params, [waterfall], {
+  const handler = branchHandler(config, [sideEffects], {
     noSchemaNoEndpoint: bridgeNoSchemaNoEndpoint,
     noSchemaWithEndpoint: bridgeNoSchemaWithEndpoint,
     bodyParamsNoEndpoint: bridgeBodyParamsNoEndpoint,
     bodyParamsWithEndpoint: bridgeBodyParamsWithEndpoint,
     searchParamsNoEndpoint: bridgeSearchParamsNoEndpoint,
-    searchParamsWithEndpoint: bridgeSearchParamsWithEndpoint
-  })
+    searchParamsWithEndpoint: bridgeSearchParamsWithEndpoint,
+  });
 
-  return handler as IkkanClientBridgeWithStateHook<Output, Schema, EndpointArgs>;
+  return handler as IkkanClientBridgeWithStateHook<
+    Output,
+    Schema,
+    EndpointArgs
+  >;
 }

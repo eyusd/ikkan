@@ -1,4 +1,4 @@
-import { Fetcher, JsonValue, NextHTTPMethod } from "@ikkan/core";
+import { IkkanFetcher, JsonValue, NextHTTPMethod } from "@ikkan/core";
 import { z } from "zod";
 
 export function makeTransform<
@@ -6,7 +6,8 @@ export function makeTransform<
   Output extends JsonValue,
   Schema extends z.ZodType | undefined,
 >(method: Method) {
-  return (partializedFetcher: Fetcher<Output, Schema, undefined>) => ({
-    [method]: partializedFetcher
-  }) as { [key in Method]: Fetcher<Output, Schema, undefined> };
+  return (partializedFetcher: IkkanFetcher<Output, Schema, undefined>) =>
+    ({
+      [method]: partializedFetcher,
+    }) as { [key in Method]: IkkanFetcher<Output, Schema, undefined> };
 }

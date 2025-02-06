@@ -1,16 +1,15 @@
 import { z } from "zod";
 import { NextHTTPMethod } from "./next";
-import { IkkanHandlerParams, JsonValue } from "./types";
+import { IkkanConfig, JsonValue } from "./types";
 
 type HandlerOperator<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
   Schema extends z.ZodType | undefined,
   EndpointArgs extends Record<string, string | string[]> | undefined,
-  SuppArgs
 > = (
-  params: IkkanHandlerParams<Method, Output, Schema, EndpointArgs>,
-  ...supplementaryArgs: SuppArgs[]
+  config: IkkanConfig<Method, Output, Schema, EndpointArgs>,
+  ...supplementaryArgs: any[]
 ) => unknown;
 
 type BranchHandlerParams<
@@ -18,43 +17,37 @@ type BranchHandlerParams<
   Output extends JsonValue,
   Schema extends z.ZodType | undefined,
   EndpointArgs extends Record<string, string | string[]> | undefined,
-  SuppArgs
 > = {
-  noSchemaNoEndpoint: HandlerOperator<Method, Output, undefined, undefined, SuppArgs>;
+  noSchemaNoEndpoint: HandlerOperator<Method, Output, undefined, undefined>;
   noSchemaWithEndpoint: HandlerOperator<
     Method,
     Output,
     undefined,
-    Exclude<EndpointArgs, undefined>,
-    SuppArgs
+    Exclude<EndpointArgs, undefined>
   >;
   bodyParamsNoEndpoint: HandlerOperator<
     Method,
     Output,
     Exclude<Schema, undefined>,
-    undefined,
-    SuppArgs
+    undefined
   >;
   bodyParamsWithEndpoint: HandlerOperator<
     Method,
     Output,
     Exclude<Schema, undefined>,
-    Exclude<EndpointArgs, undefined>,
-    SuppArgs
+    Exclude<EndpointArgs, undefined>
   >;
   searchParamsNoEndpoint: HandlerOperator<
     Method,
     Output,
     Exclude<Schema, undefined>,
-    undefined,
-    SuppArgs
+    undefined
   >;
   searchParamsWithEndpoint: HandlerOperator<
     Method,
     Output,
     Exclude<Schema, undefined>,
-    Exclude<EndpointArgs, undefined>,
-    SuppArgs
+    Exclude<EndpointArgs, undefined>
   >;
 };
 
@@ -66,42 +59,35 @@ export function branchHandler<
   Output extends JsonValue,
   Schema extends z.ZodType | undefined,
   EndpointArgs extends Record<string, string | string[]> | undefined,
-  SuppArgs
 >(
-  params: IkkanHandlerParams<Method, Output, Schema, EndpointArgs>,
-  supplementaryArgs: SuppArgs[],
-  branches: BranchHandlerParams<
-    Method,
-    Output,
-    Schema,
-    EndpointArgs,
-    SuppArgs
-  >
+  config: IkkanConfig<Method, Output, Schema, EndpointArgs>,
+  supplementaryArgs: unknown[],
+  branches: BranchHandlerParams<Method, Output, Schema, EndpointArgs>,
 ) {
-  const { endpoint, method } = params;
+  const { endpoint, method } = config;
 
-  if ("schema" in params) {
+  if ("schema" in config) {
     if (METHODS_BODY_PARAMS.includes(method)) {
       if (endpoint.length === 0) {
         return branches.bodyParamsNoEndpoint(
-          params as unknown as IkkanHandlerParams<
+          config as unknown as IkkanConfig<
             Method,
             Output,
             Exclude<Schema, undefined>,
             undefined
           >,
-          ...supplementaryArgs
+          ...supplementaryArgs,
         );
       }
       if (endpoint.length === 1) {
         return branches.bodyParamsWithEndpoint(
-          params as unknown as IkkanHandlerParams<
+          config as unknown as IkkanConfig<
             Method,
             Output,
             Exclude<Schema, undefined>,
             Exclude<EndpointArgs, undefined>
           >,
-          ...supplementaryArgs
+          ...supplementaryArgs,
         );
       }
       throw new Error("Invalid endpoint");
@@ -110,24 +96,24 @@ export function branchHandler<
     if (METHODS_SEARCH_PARAMS.includes(method)) {
       if (endpoint.length === 0) {
         return branches.searchParamsNoEndpoint(
-          params as unknown as IkkanHandlerParams<
+          config as unknown as IkkanConfig<
             Method,
             Output,
             Exclude<Schema, undefined>,
             undefined
           >,
-          ...supplementaryArgs
+          ...supplementaryArgs,
         );
       }
       if (endpoint.length === 1) {
         return branches.searchParamsWithEndpoint(
-          params as unknown as IkkanHandlerParams<
+          config as unknown as IkkanConfig<
             Method,
             Output,
             Exclude<Schema, undefined>,
             Exclude<EndpointArgs, undefined>
           >,
-          ...supplementaryArgs
+          ...supplementaryArgs,
         );
       }
       throw new Error("Invalid endpoint");
@@ -138,24 +124,19 @@ export function branchHandler<
 
   if (endpoint.length === 0) {
     return branches.noSchemaNoEndpoint(
-      params as unknown as IkkanHandlerParams<
-        Method,
-        Output,
-        undefined,
-        undefined
-      >,
-      ...supplementaryArgs
+      config as unknown as IkkanConfig<Method, Output, undefined, undefined>,
+      ...supplementaryArgs,
     );
   }
   if (endpoint.length === 1) {
     return branches.noSchemaWithEndpoint(
-      params as unknown as IkkanHandlerParams<
+      config as unknown as IkkanConfig<
         Method,
         Output,
         undefined,
         Exclude<EndpointArgs, undefined>
       >,
-      ...supplementaryArgs
+      ...supplementaryArgs,
     );
   }
   throw new Error("Invalid endpoint");

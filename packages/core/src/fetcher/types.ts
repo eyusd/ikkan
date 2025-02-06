@@ -1,29 +1,28 @@
 import { z } from "zod";
 import { JsonValue } from "../types";
 
-type FetcherParamsNoEndpointArgs<
-  Schema extends z.ZodType | undefined = undefined,
-> = Schema extends z.ZodType
-  ? [params: z.infer<Schema>, options?: RequestInit]
-  : [options?: RequestInit];
+type IkkanFetcherParamsNoEndpointArgs<Schema extends z.ZodType | undefined> =
+  Schema extends z.ZodType
+    ? [params: z.infer<Schema>, options?: RequestInit]
+    : [options?: RequestInit];
 
-type FetcherParamsWithEndpointArgs<
+type IkkanFetcherParamsWithEndpointArgs<
   Schema extends z.ZodType | undefined,
   EndpointArgs extends Record<string, string | string[]>,
 > = Schema extends z.ZodType
   ? [args: EndpointArgs, params: z.infer<Schema>, options?: RequestInit]
   : [args: EndpointArgs, options?: RequestInit];
 
-export type FetcherParams<
+export type IkkanFetcherParams<
   Schema extends z.ZodType | undefined,
   EndpointArgs extends Record<string, string | string[]> | undefined,
 > =
   EndpointArgs extends Record<string, string | string[]>
-    ? FetcherParamsWithEndpointArgs<Schema, EndpointArgs>
-    : FetcherParamsNoEndpointArgs<Schema>;
+    ? IkkanFetcherParamsWithEndpointArgs<Schema, EndpointArgs>
+    : IkkanFetcherParamsNoEndpointArgs<Schema>;
 
-export type Fetcher<
+export type IkkanFetcher<
   Output extends JsonValue,
   Schema extends z.ZodType | undefined,
   EndpointArgs extends Record<string, string | string[]> | undefined,
-> = (...args: FetcherParams<Schema, EndpointArgs>) => Promise<Output>;
+> = (...args: IkkanFetcherParams<Schema, EndpointArgs>) => Promise<Output>;

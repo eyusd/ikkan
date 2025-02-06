@@ -1,41 +1,49 @@
 import {
-  IkkanHandlerParams,
+  IkkanConfig,
   JsonValue,
   makeFetcherNoSchemaNoEndpoint,
   makeFetcherNoSchemaWithEndpoint,
   NextHTTPMethod,
 } from "@ikkan/core";
-import { partializeFetcherNoEndpoint, partializeFetcherWithEndpoint } from "./utils";
+import {
+  partializeFetcherNoEndpoint,
+  partializeFetcherWithEndpoint,
+} from "./utils";
 import { IkkanServerBridgeHandler } from "./types";
 
 export function ikkanServerBridgeNoSchemaNoEndpoint<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
-  Schema extends undefined,
-  EndpointArgs extends undefined,
->(params: IkkanHandlerParams<Method, Output, Schema, EndpointArgs>) {
-  const { endpoint, method } = params;
+>(config: IkkanConfig<Method, Output, undefined, undefined>) {
+  const { endpoint, method } = config;
 
-  const fetcher = makeFetcherNoSchemaNoEndpoint<Method, Output, Schema, EndpointArgs>(
+  const fetcher = makeFetcherNoSchemaNoEndpoint<Method, Output>(
     endpoint,
     method,
-  )
+  );
 
-  return partializeFetcherNoEndpoint(fetcher) as IkkanServerBridgeHandler<Output, Schema, EndpointArgs>;
+  return partializeFetcherNoEndpoint(fetcher) as IkkanServerBridgeHandler<
+    Output,
+    undefined,
+    undefined
+  >;
 }
 
 export function ikkanServerBridgeNoSchemaWithEndpoint<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
-  Schema extends undefined,
   EndpointArgs extends Record<string, string | string[]>,
->(params: IkkanHandlerParams<Method, Output, Schema, EndpointArgs>) {
-  const { endpoint, method } = params;
+>(config: IkkanConfig<Method, Output, undefined, EndpointArgs>) {
+  const { endpoint, method } = config;
 
-  const fetcher = makeFetcherNoSchemaWithEndpoint<Method, Output, Schema, EndpointArgs>(
+  const fetcher = makeFetcherNoSchemaWithEndpoint<Method, Output, EndpointArgs>(
     endpoint,
     method,
   );
 
-  return partializeFetcherWithEndpoint(fetcher) as IkkanServerBridgeHandler<Output, Schema, EndpointArgs>;
+  return partializeFetcherWithEndpoint(fetcher) as IkkanServerBridgeHandler<
+    Output,
+    undefined,
+    EndpointArgs
+  >;
 }

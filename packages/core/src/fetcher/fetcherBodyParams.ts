@@ -2,7 +2,7 @@ import { z } from "zod";
 import { NextHTTPMethod } from "../next";
 import { EndpointGenerator, JsonValue } from "../types";
 import { isSerializedAPIError, makeCommonError } from "../errors";
-import { Fetcher, FetcherParams } from "./types";
+import { IkkanFetcher, IkkanFetcherParams } from "./types";
 import { completeRelativeUrl } from "./utils";
 
 const fetcher = <T, Output extends JsonValue>(
@@ -32,19 +32,18 @@ export function makeFetcherBodyParamsNoEndpoint<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
   Schema extends z.ZodType,
-  EndpointArgs extends undefined,
 >(
-  endpointGenerator: EndpointGenerator<EndpointArgs>,
+  endpointGenerator: EndpointGenerator<undefined>,
   method: Method,
-): Fetcher<Output, Schema, EndpointArgs> {
+): IkkanFetcher<Output, Schema, undefined> {
   return async function fetcherBody(
-    ...args: FetcherParams<Schema, EndpointArgs>
+    ...args: IkkanFetcherParams<Schema, undefined>
   ): Promise<Output> {
     const url = endpointGenerator();
     const [params, options] = args;
 
     return await fetcher<z.infer<Schema>, Output>(method, url, params, options);
-  } as Fetcher<Output, Schema, EndpointArgs>;
+  } as IkkanFetcher<Output, Schema, undefined>;
 }
 
 export function makeFetcherBodyParamsWithEndpoint<
@@ -55,13 +54,13 @@ export function makeFetcherBodyParamsWithEndpoint<
 >(
   endpointGenerator: EndpointGenerator<EndpointArgs>,
   method: Method,
-): Fetcher<Output, Schema, EndpointArgs> {
+): IkkanFetcher<Output, Schema, EndpointArgs> {
   return async function fetcherBody(
-    ...args: FetcherParams<Schema, EndpointArgs>
+    ...args: IkkanFetcherParams<Schema, EndpointArgs>
   ): Promise<Output> {
     const [endpointGeneratorArgs, params, options] = args;
     const url = endpointGenerator(endpointGeneratorArgs);
 
     return await fetcher(method, url, params, options);
-  } as Fetcher<Output, Schema, EndpointArgs>;
+  } as IkkanFetcher<Output, Schema, EndpointArgs>;
 }

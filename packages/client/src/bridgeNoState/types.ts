@@ -1,4 +1,4 @@
-import { Fetcher, JsonValue, NextHTTPMethod } from "@ikkan/core";
+import { IkkanFetcher, JsonValue, NextHTTPMethod } from "@ikkan/core";
 import { z } from "zod";
 
 export type IkkanClientBridgeNoStateHook<
@@ -11,5 +11,5 @@ export type IkkanClientBridgeNoStateHook<
     ? [EndpointArgs]
     : []
 ) => {
-  [key in Method]: Fetcher<Output, Schema, undefined>;
+  [key in Method]: IkkanFetcher<Output, Schema, undefined>;
 };

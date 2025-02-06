@@ -14,12 +14,18 @@ import { format } from "date-fns";
 import { useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
 
-export function Task() {
+type TaskProps = {
+  id: string;
+};
+
+export function Task({ id }: TaskProps) {
   const [date, setDate] = useState<Date>();
 
   return (
     <Card className="p-3">
-      <h3 className="font-medium">Mobile Wireframes</h3>
+      <h3 className="font-medium truncate">
+        Mobile Wireframes absj zojb eojbd ojbed{" "}
+      </h3>
       <div className="mt-2">
         <span className="inline-block rounded bg-green-100 px-2 py-0.5 text-xs text-green-700">
           VIVERRA DIAM
@@ -54,8 +60,8 @@ export function Task() {
           </Popover>
         </div>
         <Avatar className="h-6 w-6">
-          <AvatarImage src="/placeholder.svg" />
-          <AvatarFallback>U1</AvatarFallback>
+          <AvatarImage src={`https://avatar.vercel.sh/${id}.svg`} />
+          <AvatarFallback>{id}</AvatarFallback>
         </Avatar>
       </div>
     </Card>

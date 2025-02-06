@@ -1,13 +1,19 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal, Plus } from "lucide-react";
 import { Task } from "./task";
+import { useGetTasks } from "@/app/api/columns/[id]/tasks/bridge";
+import { TaskLoading } from "./task-loading";
 
 type ColumnProps = {
-  id: number;
+  id: string;
   name: string;
 };
 
 export function Column({ id, name }: ColumnProps) {
+  const { data: tasks } = useGetTasks({ id })();
+
   return (
     <div className="flex w-72 flex-col">
       <div className="mb-3 flex items-center justify-between">
@@ -27,9 +33,11 @@ export function Column({ id, name }: ColumnProps) {
         </div>
       </div>
       <div className="space-y-3">
-        {Array.from({ length: 8 }).map((_, i) => (
-          <Task key={i} />
-        ))}
+        {tasks == undefined
+          ? Array.from({ length: Math.floor(1 + Math.random() * 3) }).map(
+              (_, i) => <TaskLoading key={i} />,
+            )
+          : tasks.map((id) => <Task key={id} id={id.toString()} />)}
       </div>
     </div>
   );

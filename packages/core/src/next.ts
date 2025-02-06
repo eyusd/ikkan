@@ -9,8 +9,10 @@ export type NextHTTPMethod =
   | NextHTTPMethodWithBody
   | NextHTTPMethodWithSearchParams;
 
+export type NextDynamicSegments<T extends Record<string, string | string[]>> =
+  T;
 export type NextRouteContext<T extends Record<string, string | string[]>> = {
-  params: Promise<T>;
+  params: Promise<NextDynamicSegments<T>>;
 };
 export type NextHandler<Output> = (
   req: NextRequest,

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { handleError } from "@/handler/utils";
 import {
-  IkkanHandlerParams,
+  IkkanConfig,
   JsonValue,
   NextHandler,
   NextHTTPMethod,
@@ -10,15 +10,15 @@ import {
 export function ikkanHandlerNoSchema<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
-  Schema extends undefined,
   EndpointArgs extends Record<string, string | string[]> | undefined,
 >(
-  params: IkkanHandlerParams<Method, Output, Schema, EndpointArgs>,
+  config: IkkanConfig<Method, Output, undefined, EndpointArgs>,
 ): NextHandler<Output> {
-  const { fn } = params;
-  return async (req, context) => {
+  const { fn } = config;
+  return async (req, { params: context }) => {
     try {
-      return NextResponse.json(await fn(req, context), { status: 200 });
+      const segments = await context;
+      return NextResponse.json(await fn(req, segments), { status: 200 });
     } catch (error) {
       return handleError(error);
     }

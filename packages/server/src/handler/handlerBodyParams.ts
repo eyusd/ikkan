@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { handleError } from "@/handler/utils";
 import {
-  IkkanHandlerParams,
+  IkkanConfig,
   JsonValue,
   makeCommonError,
   NextHandler,
@@ -29,13 +29,14 @@ export function ikkanHandlerBodyParams<
   Schema extends z.ZodType,
   EndpointArgs extends Record<string, string | string[]> | undefined,
 >(
-  params: IkkanHandlerParams<Method, Output, Schema, EndpointArgs>,
+  config: IkkanConfig<Method, Output, Schema, EndpointArgs>,
 ): NextHandler<Output> {
-  const { schema, fn } = params;
-  return async (req, context) => {
+  const { schema, fn } = config;
+  return async (req, { params: context }) => {
     try {
       const params = await parseBodyGuard(req, schema);
-      return NextResponse.json(await fn(req, params, context), {
+      const segments = await context;
+      return NextResponse.json(await fn(req, params, segments), {
         status: 200,
       });
     } catch (error) {

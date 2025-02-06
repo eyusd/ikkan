@@ -1,38 +1,36 @@
 import {
-  IkkanHandlerParams,
+  IkkanConfig,
   JsonValue,
   makeFetcherBodyParamsNoEndpoint,
   makeFetcherBodyParamsWithEndpoint,
   NextHTTPMethod,
 } from "@ikkan/core";
-import { WaterfallFunction } from "../types";
-import {
-  waterfallNoEndpoint,
-  waterfallWithEndpoint,
-} from "../utils";
+import { IkkanSideEffects } from "../sideEffect";
 import { makeTransformNoEndpoint, makeTransformWithEndpoint } from "./utils";
 import { z } from "zod";
 import { IkkanClientBridgeWithStateHook } from "./types";
+import { clientHookNoEndpoint, clientHookWithEndpoint } from "src/utils";
 
 export function bridgeBodyParamsNoEndpoint<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
   Schema extends z.ZodType,
-  EndpointArgs extends undefined,
-  Mut extends [string, unknown][],
+  T extends JsonValue[],
 >(
-  params: IkkanHandlerParams<Method, Output, Schema, EndpointArgs>,
-  waterfall: {
-    [K in keyof Mut]: WaterfallFunction<Mut[K][0], Output, Mut[K][1]>;
-  },
+  config: IkkanConfig<Method, Output, Schema, undefined>,
+  sideEffects: IkkanSideEffects<T, Output, Schema, undefined>,
 ) {
-  const { endpoint, method } = params;
-  const fetcher = makeFetcherBodyParamsNoEndpoint<Method, Output, Schema, EndpointArgs>(
+  const { endpoint, method } = config;
+  const fetcher = makeFetcherBodyParamsNoEndpoint<Method, Output, Schema>(
     endpoint,
     method,
   );
-  const transform = makeTransformNoEndpoint<Output, Schema, EndpointArgs>(endpoint)
-  return waterfallNoEndpoint(fetcher, waterfall, transform) as IkkanClientBridgeWithStateHook<Output, Schema, EndpointArgs>
+  const transform = makeTransformNoEndpoint<Output, Schema>(endpoint);
+  return clientHookNoEndpoint(
+    fetcher,
+    sideEffects,
+    transform,
+  ) as IkkanClientBridgeWithStateHook<Output, Schema, undefined>;
 }
 
 export function bridgeBodyParamsWithEndpoint<
@@ -40,18 +38,24 @@ export function bridgeBodyParamsWithEndpoint<
   Output extends JsonValue,
   Schema extends z.ZodType,
   EndpointArgs extends Record<string, string | string[]>,
-  Mut extends [string, unknown][],
+  T extends JsonValue[],
 >(
-  params: IkkanHandlerParams<Method, Output, Schema, EndpointArgs>,
-  waterfall: {
-    [K in keyof Mut]: WaterfallFunction<Mut[K][0], Output, Mut[K][1]>;
-  },
+  config: IkkanConfig<Method, Output, Schema, EndpointArgs>,
+  sideEffects: IkkanSideEffects<T, Output, Schema, EndpointArgs>,
 ) {
-  const { endpoint, method } = params;
-  const fetcher = makeFetcherBodyParamsWithEndpoint<Method, Output, Schema, EndpointArgs>(
+  const { endpoint, method } = config;
+  const fetcher = makeFetcherBodyParamsWithEndpoint<
+    Method,
+    Output,
+    Schema,
+    EndpointArgs
+  >(endpoint, method);
+  const transform = makeTransformWithEndpoint<Output, Schema, EndpointArgs>(
     endpoint,
-    method,
   );
-  const transform = makeTransformWithEndpoint<Output, Schema, EndpointArgs>(endpoint)
-  return waterfallWithEndpoint(fetcher, waterfall, transform) as IkkanClientBridgeWithStateHook<Output, Schema, EndpointArgs>
+  return clientHookWithEndpoint(
+    fetcher,
+    sideEffects,
+    transform,
+  ) as IkkanClientBridgeWithStateHook<Output, Schema, EndpointArgs>;
 }

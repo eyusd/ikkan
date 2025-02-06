@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
-import { NextHTTPMethod, NextRouteContext } from "./next";
+import { NextDynamicSegments, NextHTTPMethod, NextRouteContext } from "./next";
 
 type JsonObj = { [key: string]: JsonVal };
 type JsonVal = null | boolean | number | string | JsonVal[] | JsonObj;
@@ -8,50 +8,10 @@ export type JsonValue = Exclude<JsonVal, undefined>;
 
 export type EndpointGenerator<
   EndpointArgs extends Record<string, string | string[]> | undefined,
-> = EndpointArgs extends Record<string, string | string[]>
-  ? (args: EndpointArgs) => string
-  : () => string
-
-
-// export type HandlerFunctionWithSchema<Output, Schema extends z.ZodType> = (
-//   req: NextRequest,
-//   params: z.infer<Schema>,
-//   context?: NextRouteContext,
-// ) => Promise<Output>;
-
-// export type HandlerFunctionWithoutSchema<Output> = (
-//   req: NextRequest,
-//   context?: NextRouteContext,
-// ) => Promise<Output>;
-
-// type IkkanMethodHandlerParamsWithoutSchema<Output> = {
-//   fn: HandlerFunctionWithoutSchema<Output>;
-// };
-// type IkkanMethodHandlerParamsWithSchema<Output, Schema extends z.ZodType> = {
-//   schema: Schema;
-//   fn: HandlerFunctionWithSchema<Output, Schema>;
-// };
-// export type IkkanMethodHandlerParams<
-//   Output = unknown,
-//   Schema extends z.ZodType | undefined = undefined,
-// > = Schema extends z.ZodType
-//   ? IkkanMethodHandlerParamsWithSchema<Output, Exclude<Schema, undefined>>
-//   : IkkanMethodHandlerParamsWithoutSchema<Output>;
-// export type IkkanServerHandlerParams<
-//   Method extends NextHTTPMethod,
-//   Output extends JsonValue,
-//   Schema extends z.ZodType | undefined = undefined,
-// > = {
-//   method: Method;
-// } & IkkanMethodHandlerParams<Output, Schema>;
-// export type IkkanHandlerParams<
-//   EndpointGenerator extends (...args: unknown[]) => string,
-//   Method extends NextHTTPMethod,
-//   Output extends JsonValue,
-//   Schema extends z.ZodType | undefined = undefined,
-// > = {
-//   endpoint: EndpointGenerator;
-// } & IkkanServerHandlerParams<Method, Output, Schema>;
+> =
+  EndpointArgs extends Record<string, string | string[]>
+    ? (args: EndpointArgs) => string
+    : () => string;
 
 type IkkanFunctionNoSchemaNoContext<Output extends JsonValue> = (
   req: NextRequest,
@@ -62,7 +22,7 @@ type IkkanFunctionNoSchemaWithContext<
   EndpointArgs extends Record<string, string | string[]>,
 > = (
   req: NextRequest,
-  context: NextRouteContext<EndpointArgs>,
+  context: NextDynamicSegments<EndpointArgs>,
 ) => Promise<Output>;
 
 type IkkanFunctionWithSchemaNoContext<
@@ -77,16 +37,14 @@ type IkkanFunctionWithSchemaWithContext<
 > = (
   req: NextRequest,
   params: z.infer<Schema>,
-  context: NextRouteContext<EndpointArgs>,
+  segments: NextDynamicSegments<EndpointArgs>,
 ) => Promise<Output>;
 
-export type IkkanHandlerParams<
+export type IkkanConfig<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
   Schema extends z.ZodType | undefined,
-  EndpointArgs extends
-    | Record<string, string | string[]>
-    | undefined,
+  EndpointArgs extends Record<string, string | string[]> | undefined,
 > = {
   method: Method;
   endpoint: EndpointGenerator<EndpointArgs>;

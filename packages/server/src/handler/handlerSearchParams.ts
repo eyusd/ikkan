@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { handleError, zodKeys } from "@/handler/utils";
+import { handleError } from "@/handler/utils";
 import {
-  IkkanHandlerParams,
+  IkkanConfig,
   JsonValue,
   makeCommonError,
   NextHandler,
@@ -15,11 +15,8 @@ async function parseSearchGuard<T extends z.ZodType>(
 ): Promise<z.infer<T>> {
   try {
     const url = new URL(req.url);
-    const keys = zodKeys(schema);
     const params = JSON.parse(url.searchParams.get("params") ?? "{}");
-    return schema.parse(
-      Object.fromEntries(keys.map((key) => [key, params[key] ?? null])),
-    );
+    return schema.parse(params);
   } catch (error) {
     if (error instanceof z.ZodError) {
       throw makeCommonError("invalidParams", error.issues);
@@ -34,13 +31,14 @@ export function ikkanHandlerSearchParams<
   Schema extends z.ZodType,
   EndpointArgs extends Record<string, string | string[]> | undefined,
 >(
-  params: IkkanHandlerParams<Method, Output, Schema, EndpointArgs>,
+  config: IkkanConfig<Method, Output, Schema, EndpointArgs>,
 ): NextHandler<Output> {
-  const { schema, fn } = params;
-  return async (req, context) => {
+  const { schema, fn } = config;
+  return async (req, { params: context }) => {
     try {
       const params = await parseSearchGuard(req, schema);
-      return NextResponse.json(await fn(req, params, context), {
+      const segments = await context;
+      return NextResponse.json(await fn(req, params, segments), {
         status: 200,
       });
     } catch (error) {

@@ -1,7 +1,7 @@
 import {
   EndpointGenerator,
-  Fetcher,
-  FetcherParams,
+  IkkanFetcher,
+  IkkanFetcherParams,
   isSerializedAPIError,
   JsonValue,
   makeCommonError,
@@ -31,14 +31,13 @@ function stateWrapper<Output extends JsonValue>(
 export function makeTransformNoEndpoint<
   Output extends JsonValue,
   Schema extends z.ZodType | undefined,
-  EndpointArgs extends undefined,
->(endpoint: EndpointGenerator<EndpointArgs>) {
-  return (partializedFetcher: Fetcher<Output, Schema, undefined>) => {
+>(endpoint: EndpointGenerator<undefined>) {
+  return (partializedFetcher: IkkanFetcher<Output, Schema, undefined>) => {
     const url = endpoint();
-    return function hook(...params: FetcherParams<Schema, undefined>) {
+    return function hook(...params: IkkanFetcherParams<Schema, undefined>) {
       return stateWrapper<Output>(url, () => partializedFetcher(...params));
-    }
-  }
+    };
+  };
 }
 
 export function makeTransformWithEndpoint<
@@ -46,10 +45,13 @@ export function makeTransformWithEndpoint<
   Schema extends z.ZodType | undefined,
   EndpointArgs extends Record<string, string | string[]>,
 >(endpoint: EndpointGenerator<EndpointArgs>) {
-  return (partializedFetcher: Fetcher<Output, Schema, undefined>, args: EndpointArgs) => {
+  return (
+    partializedFetcher: IkkanFetcher<Output, Schema, undefined>,
+    args: EndpointArgs,
+  ) => {
     const url = endpoint(args);
-    return function hook(...params: FetcherParams<Schema, undefined>) {
+    return function hook(...params: IkkanFetcherParams<Schema, undefined>) {
       return stateWrapper<Output>(url, () => partializedFetcher(...params));
-    }
-  }
+    };
+  };
 }

@@ -17,7 +17,7 @@ model Task {
   id        Int      @id @default(autoincrement())
   name      String
   content   String
-  date      DateTime
+  date      String
   column    Column   @relation(fields: [columnId], references: [id])
   columnId  Int
 }

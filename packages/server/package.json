@@ -19,15 +19,7 @@
   },
   "dependencies": {
     "@ikkan/core": "workspace:*",
-    "zod": "^3.24.1"
-  },
-  "devDependencies": {
-    "globals": "^15.14.0",
     "next": "^15.1.6",
-    "tsup": "^8.3.5",
-    "typescript": "^5.7.3"
-  },
-  "peerDependencies": {
-    "next": "^15.1.6"
+    "zod": "^3.24.1"
   }
 }

@@ -7,7 +7,7 @@ import {
   NextHandler,
   branchHandler,
 } from "@ikkan/core";
-import { IkkanHandlerParams } from "@ikkan/core";
+import { IkkanConfig } from "@ikkan/core";
 import { ikkanHandlerNoSchema } from "./handlerNoSchema";
 
 type IkkanHandlerExport<
@@ -23,9 +23,9 @@ export function ikkanHandler<
     | Record<string, string | string[]>
     | undefined = undefined,
 >(
-  params: IkkanHandlerParams<Method, Output, Schema, EndpointArgs>,
+  config: IkkanConfig<Method, Output, Schema, EndpointArgs>,
 ): IkkanHandlerExport<Method, Output> {
-  const handler = branchHandler(params, [], {
+  const handler = branchHandler(config, [], {
     noSchemaNoEndpoint: ikkanHandlerNoSchema,
     noSchemaWithEndpoint: ikkanHandlerNoSchema,
     bodyParamsNoEndpoint: ikkanHandlerBodyParams,
@@ -34,5 +34,5 @@ export function ikkanHandler<
     searchParamsWithEndpoint: ikkanHandlerSearchParams,
   });
 
-  return { [params.method]: handler } as IkkanHandlerExport<Method, Output>;
+  return { [config.method]: handler } as IkkanHandlerExport<Method, Output>;
 }

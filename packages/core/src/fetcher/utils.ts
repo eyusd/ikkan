@@ -1,8 +1,3 @@
-import { z } from "zod";
-import { NextHTTPMethod } from "../next";
-import { JsonValue } from "../types";
-import { Fetcher, FetcherParams } from "./types";
-
 const isAbsoluteUrlRegex = /^(?:[a-z]+:)?\/\//i;
 
 export function completeRelativeUrl(url: string) {

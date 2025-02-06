@@ -1,11 +1,14 @@
 import {
-  IkkanHandlerParams,
+  IkkanConfig,
   JsonValue,
   makeFetcherBodyParamsNoEndpoint,
   makeFetcherBodyParamsWithEndpoint,
   NextHTTPMethod,
 } from "@ikkan/core";
-import { partializeFetcherNoEndpoint, partializeFetcherWithEndpoint } from "./utils";
+import {
+  partializeFetcherNoEndpoint,
+  partializeFetcherWithEndpoint,
+} from "./utils";
 import { z } from "zod";
 import { IkkanServerBridgeHandler } from "./types";
 
@@ -13,16 +16,19 @@ export function ikkanServerBridgeBodyParamsNoEndpoint<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
   Schema extends z.ZodType,
-  EndpointArgs extends undefined,
->(params: IkkanHandlerParams<Method, Output, Schema, EndpointArgs>) {
-  const { endpoint, method } = params;
+>(config: IkkanConfig<Method, Output, Schema, undefined>) {
+  const { endpoint, method } = config;
 
-  const fetcher = makeFetcherBodyParamsNoEndpoint<Method, Output, Schema, EndpointArgs>(
+  const fetcher = makeFetcherBodyParamsNoEndpoint<Method, Output, Schema>(
     endpoint,
     method,
   );
 
-  return partializeFetcherNoEndpoint(fetcher) as IkkanServerBridgeHandler<Output, Schema, EndpointArgs>;
+  return partializeFetcherNoEndpoint(fetcher) as IkkanServerBridgeHandler<
+    Output,
+    Schema,
+    undefined
+  >;
 }
 
 export function ikkanServerBridgeBodyParamsWithEndpoint<
@@ -30,8 +36,8 @@ export function ikkanServerBridgeBodyParamsWithEndpoint<
   Output extends JsonValue,
   Schema extends z.ZodType,
   EndpointArgs extends Record<string, string | string[]>,
->(params: IkkanHandlerParams<Method, Output, Schema, EndpointArgs>) {
-  const { endpoint, method } = params;
+>(config: IkkanConfig<Method, Output, Schema, EndpointArgs>) {
+  const { endpoint, method } = config;
 
   const fetcher = makeFetcherBodyParamsWithEndpoint<
     Method,
@@ -40,5 +46,9 @@ export function ikkanServerBridgeBodyParamsWithEndpoint<
     EndpointArgs
   >(endpoint, method);
 
-  return partializeFetcherWithEndpoint(fetcher) as IkkanServerBridgeHandler<Output, Schema, EndpointArgs>;
+  return partializeFetcherWithEndpoint(fetcher) as IkkanServerBridgeHandler<
+    Output,
+    Schema,
+    EndpointArgs
+  >;
 }

@@ -1,55 +1,47 @@
 import {
-  IkkanHandlerParams,
+  IkkanConfig,
   JsonValue,
   makeFetcherNoSchemaNoEndpoint,
   makeFetcherNoSchemaWithEndpoint,
   NextHTTPMethod,
 } from "@ikkan/core";
-import { WaterfallFunction } from "../types";
-import {
-  waterfallNoEndpoint,
-  waterfallWithEndpoint,
-} from "../utils";
 import { makeTransformNoEndpoint, makeTransformWithEndpoint } from "./utils";
+import { IkkanSideEffects } from "../sideEffect";
+import { clientHookNoEndpoint, clientHookWithEndpoint } from "src/utils";
 
 export function bridgeNoSchemaNoEndpoint<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
-  Schema extends undefined,
-  EndpointArgs extends undefined,
-  Mut extends [string, unknown][],
+  T extends JsonValue[],
 >(
-  params: IkkanHandlerParams<Method, Output, Schema, EndpointArgs>,
-  waterfall: {
-    [K in keyof Mut]: WaterfallFunction<Mut[K][0], Output, Mut[K][1]>;
-  },
+  config: IkkanConfig<Method, Output, undefined, undefined>,
+  sideEffects: IkkanSideEffects<T, Output, undefined, undefined>,
 ) {
-  const { endpoint, method } = params;
-  const fetcher = makeFetcherNoSchemaNoEndpoint<Method, Output, Schema, EndpointArgs>(
+  const { endpoint, method } = config;
+  const fetcher = makeFetcherNoSchemaNoEndpoint<Method, Output>(
     endpoint,
     method,
   );
-  const transform = makeTransformNoEndpoint<Output, Schema, EndpointArgs>(endpoint);
-  return waterfallNoEndpoint(fetcher, waterfall, transform);
+  const transform = makeTransformNoEndpoint<Output, undefined>(endpoint);
+  return clientHookNoEndpoint(fetcher, sideEffects, transform);
 }
 
 export function bridgeNoSchemaWithEndpoint<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
-  Schema extends undefined,
   EndpointArgs extends Record<string, string | string[]>,
-  Mut extends [string, unknown][],
+  T extends JsonValue[],
 >(
-  params: IkkanHandlerParams<Method, Output, Schema, EndpointArgs>,
-  waterfall: {
-    [K in keyof Mut]: WaterfallFunction<Mut[K][0], Output, Mut[K][1]>;
-  },
+  config: IkkanConfig<Method, Output, undefined, EndpointArgs>,
+  sideEffects: IkkanSideEffects<T, Output, undefined, EndpointArgs>,
 ) {
-  const { endpoint, method } = params;
-  const fetcher = makeFetcherNoSchemaWithEndpoint<Method, Output, Schema, EndpointArgs>(
+  const { endpoint, method } = config;
+  const fetcher = makeFetcherNoSchemaWithEndpoint<Method, Output, EndpointArgs>(
     endpoint,
     method,
   );
-  const transform = makeTransformWithEndpoint<Output, Schema, EndpointArgs>(endpoint);
-  return waterfallWithEndpoint(fetcher, waterfall, transform);
+  const transform = makeTransformWithEndpoint<Output, undefined, EndpointArgs>(
+    endpoint,
+  );
+  return clientHookWithEndpoint(fetcher, sideEffects, transform);
 }
