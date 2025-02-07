@@ -1,5 +1,18 @@
 # example
 
+## 1.0.0
+
+### Major Changes
+
+- 7037611: Somewhat stable API, and improved typing system
+
+### Patch Changes
+
+- Updated dependencies [7037611]
+  - @ikkan/client@3.0.0
+  - @ikkan/server@3.0.0
+  - @ikkan/core@3.0.0
+
 ## 0.1.1
 
 ### Patch Changes

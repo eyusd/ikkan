@@ -1,5 +1,16 @@
 # @ikkan/server
 
+## 3.0.0
+
+### Major Changes
+
+- 7037611: Somewhat stable API, and improved typing system
+
+### Patch Changes
+
+- Updated dependencies [7037611]
+  - @ikkan/core@3.0.0
+
 ## 2.0.0
 
 ### Major Changes
