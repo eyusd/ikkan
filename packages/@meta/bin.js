@@ -66,37 +66,53 @@ function parsePackageInfo(output) {
 async function getDependencyVersions(packageManager) {
   const versions = {};
   
-  // First, get the latest versions of @ikkan packages
   try {
-    // Get @ikkan/client info for zod, react, swr, and @types/react versions
+    // Get @ikkan/client info
     const clientOutput = execSync(getPackageInfoCommand(packageManager, '@ikkan/client'), { encoding: 'utf8' });
     const clientInfo = parsePackageInfo(clientOutput);
-    const clientDeps = clientInfo.versions[clientInfo['dist-tags'].latest].dependencies || {};
-    const clientDevDeps = clientInfo.versions[clientInfo['dist-tags'].latest].devDependencies || {};
+    
+    // Get the latest version number
+    const latestVersion = clientInfo['dist-tags'].latest;
+    versions['@ikkan/client'] = latestVersion;
+    
+    // Get dependencies from the latest version
+    const clientDeps = clientInfo.dependencies || {};
+    const clientDevDeps = clientInfo.devDependencies || {};
 
-    versions['@ikkan/client'] = clientInfo['dist-tags'].latest;
+    // Extract versions from @ikkan/client dependencies
     versions['zod'] = clientDeps['zod'] || null;
     versions['react'] = clientDeps['react'] || null;
     versions['swr'] = clientDeps['swr'] || null;
     versions['@types/react'] = clientDevDeps['@types/react'] || null;
+    versions['@ikkan/core'] = clientDeps['@ikkan/core'] || null;
 
     // Get @ikkan/server info for next version
     const serverOutput = execSync(getPackageInfoCommand(packageManager, '@ikkan/server'), { encoding: 'utf8' });
     const serverInfo = parsePackageInfo(serverOutput);
-    const serverDeps = serverInfo.versions[serverInfo['dist-tags'].latest].dependencies || {};
+    const serverDeps = serverInfo.dependencies || {};
 
     versions['@ikkan/server'] = serverInfo['dist-tags'].latest;
     versions['next'] = serverDeps['next'] || null;
 
-    // Get @ikkan/core version
-    const coreOutput = execSync(getPackageInfoCommand(packageManager, '@ikkan/core'), { encoding: 'utf8' });
-    const coreInfo = parsePackageInfo(coreOutput);
-    versions['@ikkan/core'] = coreInfo['dist-tags'].latest;
-
   } catch (error) {
-    console.error('❌ Error fetching @ikkan package information:', error.message);
+    console.error('❌ Error fetching package information:', error.message);
+    console.error('Please ensure you have an internet connection and the packages exist.');
     process.exit(1);
   }
+
+  // Remove any ^ or ~ from versions
+  Object.keys(versions).forEach(key => {
+    if (versions[key]) {
+      versions[key] = versions[key].replace(/[\^~]/g, '');
+    }
+  });
+
+  // Log the versions we're going to use
+  console.log('📋 Target versions:');
+  Object.entries(versions).forEach(([pkg, version]) => {
+    console.log(`   ${pkg}: ${version || 'version not found'}`);
+  });
+  console.log();
 
   return versions;
 }

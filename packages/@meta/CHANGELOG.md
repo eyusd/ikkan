@@ -1,5 +1,11 @@
 # ikkan
 
+## 3.0.1
+
+### Patch Changes
+
+- Fixed install script
+
 ## 3.0.0
 
 ### Major Changes
