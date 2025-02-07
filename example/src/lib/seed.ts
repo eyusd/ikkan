@@ -53,24 +53,28 @@ export async function seedDatabase() {
           content:
             "Initialize Next.js project with Prisma and configure database",
           date: new Date().toISOString(),
+          tag: "nextjs",
           columnId: todoColumn.id,
         },
         {
           name: "Design database schema",
           content: "Create initial database schema for the application",
           date: add(new Date(), { days: 1 }).toISOString(),
+          tag: "prisma",
           columnId: todoColumn.id,
         },
         {
           name: "Implement authentication",
           content: "Add user authentication using Next.js middleware",
           date: add(new Date(), { days: 2 }).toISOString(),
+          tag: "nextjs",
           columnId: inProgressColumn.id,
         },
         {
           name: "Write documentation",
           content: "Document the API and database schema",
           date: add(new Date(), { days: -1 }).toISOString(),
+          tag: "docs",
           columnId: doneColumn.id,
         },
       ],

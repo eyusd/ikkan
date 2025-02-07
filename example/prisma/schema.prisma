@@ -17,6 +17,7 @@ model Task {
   id        Int      @id @default(autoincrement())
   name      String
   content   String
+  tag       String
   date      String
   column    Column   @relation(fields: [columnId], references: [id])
   columnId  Int

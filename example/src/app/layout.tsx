@@ -30,7 +30,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased h-screen py-16`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased h-screen items-center justify-center flex flex-col`}
       >
         {children}
       </body>

@@ -5,6 +5,7 @@ import { MoreHorizontal, Plus } from "lucide-react";
 import { Task } from "./task";
 import { useGetTasks } from "@/app/api/columns/[id]/tasks/bridge";
 import { TaskLoading } from "./task-loading";
+import { AddTask } from "./add-task";
 
 type ColumnProps = {
   id: string;
@@ -20,20 +21,18 @@ export function Column({ id, name }: ColumnProps) {
         <div className="flex items-center gap-2">
           <h2 className="font-medium">{name}</h2>
           <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs">
-            3
+            {tasks?.length ?? "0"}
           </span>
         </div>
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" className="h-7 w-7">
-            <Plus className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="icon" className="h-7 w-7">
+          <AddTask id={id} />
+          <Button variant="ghost" size="icon" className="h-7 w-7" disabled>
             <MoreHorizontal className="h-4 w-4" />
           </Button>
         </div>
       </div>
       <div className="space-y-3">
-        {tasks == undefined
+        {tasks === undefined
           ? Array.from({ length: Math.floor(1 + Math.random() * 3) }).map(
               (_, i) => <TaskLoading key={i} />,
             )

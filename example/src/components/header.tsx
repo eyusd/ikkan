@@ -20,7 +20,7 @@ export function Header() {
             </Avatar>
           ))}
         </div>
-        <Button variant="outline" size="sm" className="ml-2">
+        <Button variant="outline" size="sm" className="ml-2" disabled>
           <Plus className="mr-1 h-4 w-4" />
           New Member
         </Button>
