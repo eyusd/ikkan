@@ -11,3 +11,12 @@ export type IkkanServerBridgeHandler<
     ? [args: EndpointArgs]
     : []
 ) => IkkanFetcher<Output, Schema, undefined>;
+
+export type IkkanSchema<T> = T extends IkkanServerBridgeHandler<
+  infer _Output,
+  infer Schema,
+  infer _EndpointArgs
+> ? Schema extends z.ZodType
+    ? Schema
+    : never
+  : never;

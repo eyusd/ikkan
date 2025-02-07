@@ -68,76 +68,69 @@ export function branchHandler<
 
   if ("schema" in config) {
     if (METHODS_BODY_PARAMS.includes(method)) {
-      if (endpoint.length === 0) {
-        return branches.bodyParamsNoEndpoint(
-          config as unknown as IkkanConfig<
-            Method,
-            Output,
-            Exclude<Schema, undefined>,
-            undefined
-          >,
-          ...supplementaryArgs,
-        );
+      switch (endpoint.length) {
+        case 0: {
+          return branches.bodyParamsNoEndpoint(
+            // @ts-expect-error
+            config,
+            ...supplementaryArgs,
+          );
+        }
+        case 1: {
+          return branches.bodyParamsWithEndpoint(
+            // @ts-expect-error
+            config,
+            ...supplementaryArgs,
+          );
+        }
+        default: {
+          throw new Error("Invalid endpoint");
+        }
       }
-      if (endpoint.length === 1) {
-        return branches.bodyParamsWithEndpoint(
-          config as unknown as IkkanConfig<
-            Method,
-            Output,
-            Exclude<Schema, undefined>,
-            Exclude<EndpointArgs, undefined>
-          >,
-          ...supplementaryArgs,
-        );
-      }
-      throw new Error("Invalid endpoint");
     }
 
     if (METHODS_SEARCH_PARAMS.includes(method)) {
-      if (endpoint.length === 0) {
-        return branches.searchParamsNoEndpoint(
-          config as unknown as IkkanConfig<
-            Method,
-            Output,
-            Exclude<Schema, undefined>,
-            undefined
-          >,
-          ...supplementaryArgs,
-        );
+      switch (endpoint.length) {
+        case 0: {
+          return branches.searchParamsNoEndpoint(
+            // @ts-expect-error
+            config,
+            ...supplementaryArgs,
+          );
+        }
+        case 1: {
+          return branches.searchParamsWithEndpoint(
+            // @ts-expect-error
+            config,
+            ...supplementaryArgs,
+          );
+        }
+        default: {
+          throw new Error("Invalid endpoint");
+        }
       }
-      if (endpoint.length === 1) {
-        return branches.searchParamsWithEndpoint(
-          config as unknown as IkkanConfig<
-            Method,
-            Output,
-            Exclude<Schema, undefined>,
-            Exclude<EndpointArgs, undefined>
-          >,
-          ...supplementaryArgs,
-        );
-      }
-      throw new Error("Invalid endpoint");
     }
 
     throw new Error("Invalid method");
   }
 
-  if (endpoint.length === 0) {
-    return branches.noSchemaNoEndpoint(
-      config as unknown as IkkanConfig<Method, Output, undefined, undefined>,
-      ...supplementaryArgs,
-    );
+  switch (endpoint.length) {
+    case 0: {
+      return branches.noSchemaNoEndpoint(
+        // @ts-expect-error
+        config,
+        ...supplementaryArgs,
+      );
+    }
+    case 1: {
+      return branches.noSchemaWithEndpoint(
+        // @ts-expect-error
+        config,
+        ...supplementaryArgs,
+      );
+    }
+    default: {
+      throw new Error("Invalid endpoint");
+    }
   }
-  if (endpoint.length === 1) {
-    return branches.noSchemaWithEndpoint(
-      config as unknown as IkkanConfig<
-        Method,
-        Output,
-        undefined,
-        Exclude<EndpointArgs, undefined>
-      >,
-      ...supplementaryArgs,
-    );
-  }
-  throw new Error("Invalid endpoint");
 }

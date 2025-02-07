@@ -21,10 +21,9 @@ export function partializeFetcherWithEndpoint<
 >(fetcher: IkkanFetcher<Output, Schema, EndpointArgs>) {
   return (args: EndpointArgs) => {
     return async function fetcherPartialized(
-      ...params: IkkanFetcherParams<Schema, EndpointArgs>
+      ...params: IkkanFetcherParams<Schema, undefined>
     ): Promise<Output> {
-      // @ts-expect-error - this is a hack to make the types work
-      return await fetcher(args, ...params);
+      return await fetcher(...[args, ...params] as any);
     } as IkkanFetcher<Output, Schema, undefined>;
   };
 }

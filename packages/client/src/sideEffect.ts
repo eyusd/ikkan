@@ -133,7 +133,7 @@ export function sideEffect<
   FromSchema extends z.ZodType | undefined,
   FromEndpointArgs extends Record<string, string | string[]> | undefined,
 >(
-  _fromConfig: IkkanConfig<
+  fromConfig: IkkanConfig<
     FromMethod,
     FromOutput,
     FromSchema,

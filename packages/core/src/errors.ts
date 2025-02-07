@@ -22,7 +22,6 @@ export class APIError extends Error {
 }
 
 // For the consumers of the API
-export type NoAPIError<T> = T extends SerializedAPIError ? never : T;
 export const isSerializedAPIError = (
   something: unknown,
 ): something is SerializedAPIError => {

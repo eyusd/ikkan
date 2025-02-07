@@ -1,5 +1,4 @@
 import {
-  ikkanConfig,
   IkkanConfig,
   JsonValue,
   NextHTTPMethod,
@@ -8,9 +7,10 @@ import { z } from "zod";
 import { IkkanClientBridgeHandler } from "./types";
 import { ikkanBridgeWithState } from "./bridgeWithState";
 import { ikkanBridgeNoState } from "./bridgeNoState";
-import { IkkanSideEffects, sideEffect } from "./sideEffect";
+import { IkkanSideEffects } from "./sideEffect";
 
-export { sideEffect };
+export { sideEffect } from "./sideEffect";
+export { type IkkanSchema } from "./types";
 
 export function ikkanClientBridge<
   Method extends NextHTTPMethod,
@@ -23,7 +23,6 @@ export function ikkanClientBridge<
   sideEffects: IkkanSideEffects<T, Output, Schema, EndpointArgs> = [] as any,
 ): IkkanClientBridgeHandler<Method, Output, Schema, EndpointArgs> {
   const hook = ikkanBridgeWithState(config, sideEffects);
-  // @ts-ignore
   const action = ikkanBridgeNoState(config, sideEffects);
   return { hook, action } as IkkanClientBridgeHandler<
     Method,
@@ -32,24 +31,3 @@ export function ikkanClientBridge<
     EndpointArgs
   >;
 }
-
-const config = ikkanConfig({
-  endpoint: ({ id }: { id: string }) => `/api/${id}`,
-  method: "GET",
-  schema: z.object({
-    name: z.string(),
-  }),
-  fn: async (_req, { name }, { id }) => {
-    return { name: name + id };
-  },
-});
-
-const client = ikkanClientBridge(config, [
-  sideEffect(
-    config,
-    config,
-  )({
-    endpointGenerator: ({ args: { id }, params: { name } }) => ({ id }),
-    mutator: (cachedValue, response) => ({ name: response.name }),
-  }),
-]);

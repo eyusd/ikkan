@@ -8,6 +8,6 @@ export function makeTransform<
 >(method: Method) {
   return (partializedFetcher: IkkanFetcher<Output, Schema, undefined>) =>
     ({
-      [method]: partializedFetcher,
-    }) as { [key in Method]: IkkanFetcher<Output, Schema, undefined> };
+      [method.toLowerCase()]: partializedFetcher,
+    }) as { [key in Lowercase<Method>]: IkkanFetcher<Output, Schema, undefined> };
 }

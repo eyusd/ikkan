@@ -13,7 +13,9 @@ import { ikkanHandlerNoSchema } from "./handlerNoSchema";
 type IkkanHandlerExport<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
-> = Record<Method, NextHandler<Output>>;
+> = {
+  [key in Uppercase<Method>]: NextHandler<Output>
+}
 
 export function ikkanHandler<
   Method extends NextHTTPMethod,
@@ -25,6 +27,7 @@ export function ikkanHandler<
 >(
   config: IkkanConfig<Method, Output, Schema, EndpointArgs>,
 ): IkkanHandlerExport<Method, Output> {
+  const { method } = config;
   const handler = branchHandler(config, [], {
     noSchemaNoEndpoint: ikkanHandlerNoSchema,
     noSchemaWithEndpoint: ikkanHandlerNoSchema,
@@ -34,5 +37,5 @@ export function ikkanHandler<
     searchParamsWithEndpoint: ikkanHandlerSearchParams,
   });
 
-  return { [config.method]: handler } as IkkanHandlerExport<Method, Output>;
+  return { [method.toUpperCase()]: handler } as IkkanHandlerExport<Method, Output>;
 }

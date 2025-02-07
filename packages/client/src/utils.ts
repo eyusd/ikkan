@@ -1,6 +1,7 @@
 import {
   IkkanFetcher,
   IkkanFetcherParams,
+  isSerializedAPIError,
   JsonValue,
   makeCommonError,
 } from "@ikkan/core";
@@ -15,13 +16,13 @@ async function applySideEffects<
   EndpointArgs extends Record<string, string | string[]> | undefined,
   T extends JsonValue[],
 >(
-  args: FullArgs<Output, Schema, EndpointArgs>,
+  fullArgs: FullArgs<Output, Schema, EndpointArgs>,
   sideEffects: IkkanSideEffects<T, Output, Schema, EndpointArgs>,
 ) {
   await Promise.all(
     sideEffects.map(async ({ mutator, urlGenerator }) => {
-      const { output } = args;
-      const url = urlGenerator(args);
+      const { output } = fullArgs;
+      const url = urlGenerator(fullArgs);
       const operator: unknown = (cachedValue: unknown) => {
         // @ts-expect-error - variadic types are not supported
         return mutator(cachedValue, output);
@@ -55,8 +56,8 @@ export function clientHookNoEndpoint<
         const response = await (
           fetcher as IkkanFetcher<Output, Schema, undefined>
         )(...params);
-        const args = { output: response, ...params } as any;
-        await applySideEffects(args, sideEffects);
+        const fullArgs = { output: response, params, args: undefined } as FullArgs<Output, Schema, undefined>;
+        await applySideEffects(fullArgs, sideEffects);
         return response;
       } catch (error) {
         throw makeCommonError("requestError", error).toJSON();
@@ -86,12 +87,14 @@ export function clientHookWithEndpoint<
       ...params: IkkanFetcherParams<Schema, undefined>
     ): Promise<Output> => {
       try {
-        // @ts-expect-error - this is a hack to make the types work
-        const response = await fetcher(args, ...params);
-        const args = { output: response, ...params } as any;
-        await applySideEffects(args, sideEffects);
+        const response = await fetcher(...[args, ...params] as any);
+        const fullArgs = { output: response, params, args } as FullArgs<Output, Schema, EndpointArgs>
+        await applySideEffects(fullArgs, sideEffects);
         return response;
       } catch (error) {
+        if (isSerializedAPIError(error)) {
+          throw error;
+        }
         throw makeCommonError("requestError", error).toJSON();
       }
     };

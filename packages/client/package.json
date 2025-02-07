@@ -19,16 +19,11 @@
   },
   "dependencies": {
     "@ikkan/core": "workspace:*",
+    "react": "^18.0.0",
     "swr": "^2.3.0",
     "zod": "^3.24.1"
   },
   "devDependencies": {
-    "@types/react": "^19.0.4",
-    "@types/react-dom": "^19.0.2",
-    "globals": "^15.14.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "tsup": "^8.3.5",
-    "typescript": "^5.7.3"
+    "@types/react": "^18"
   }
 }

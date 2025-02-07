@@ -7,7 +7,7 @@ export type IkkanClientBridgeWithStateHook<
   EndpointArgs extends Record<string, string | string[]> | undefined,
 > = (
   ...args: EndpointArgs extends Record<string, string | string[]>
-    ? [EndpointArgs]
+    ? [args: EndpointArgs]
     : []
 ) => (...params: IkkanFetcherParams<Schema, undefined>) => {
   data: Output | undefined;

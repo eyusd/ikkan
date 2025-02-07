@@ -19,6 +19,7 @@ import {
   ikkanServerBridgeSearchParamsWithEndpoint,
 } from "./bridgeSearchParams";
 
+export { type IkkanSchema } from "./types";
 export function ikkanServerBridge<
   Method extends NextHTTPMethod,
   Output extends JsonValue,

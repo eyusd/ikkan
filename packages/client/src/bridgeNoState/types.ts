@@ -8,8 +8,8 @@ export type IkkanClientBridgeNoStateHook<
   EndpointArgs extends Record<string, string | string[]> | undefined,
 > = (
   ...args: EndpointArgs extends Record<string, string | string[]>
-    ? [EndpointArgs]
+    ? [args: EndpointArgs]
     : []
 ) => {
-  [key in Method]: IkkanFetcher<Output, Schema, undefined>;
+  [key in Lowercase<Method>]: IkkanFetcher<Output, Schema, undefined>;
 };

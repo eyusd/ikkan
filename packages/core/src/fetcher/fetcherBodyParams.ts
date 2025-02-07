@@ -25,6 +25,9 @@ const fetcher = <T, Output extends JsonValue>(
       return result;
     })
     .catch((error) => {
+      if (isSerializedAPIError(error)) {
+        throw error;
+      }
       throw makeCommonError("requestError", error).toJSON();
     });
 
