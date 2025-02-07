@@ -3,14 +3,11 @@
   "version": "2.0.0",
   "description": "Meta-package for the Ikkan framework",
   "keywords": [
-    "ikkan",
-    "framework"
+    "ikkan"
   ],
   "author": "eyusd",
   "license": "MIT",
-  "dependencies": {
-    "@ikkan/core": "^2.0.0",
-    "@ikkan/client": "^2.0.0",
-    "@ikkan/server": "^2.0.0"
+  "bin": {
+    "ikkan": "./bin.js"
   }
 }

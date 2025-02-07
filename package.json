@@ -5,7 +5,7 @@
   "keywords": [],
   "author": "eyusd",
   "license": "MIT",
-  "packageManager": "pnpm@10.2.0",
+  "packageManager": "pnpm@10.2.1",
   "scripts": {
     "build": "turbo run build --filter=!example",
     "dev": "turbo run dev --filter=!example",
@@ -13,14 +13,14 @@
     "clean": "turbo run clean --filter=!example",
     "test": "turbo run test --filter=!example",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "publish-packages": "node generate-meta.js && turbo run build --filter=!example && changeset publish"
+    "publish-packages": "turbo run build --filter=!example && changeset publish"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.12",
     "@types/node": "^22.12.0",
     "prettier": "^3.4.2",
-    "turbo": "^2.4.0",
     "tsup": "^8.3.5",
+    "turbo": "^2.4.0",
     "typescript": "^5.7.3"
   }
 }
