@@ -7,62 +7,70 @@ type HandlerOperator<
   Output extends JsonValue,
   Schema extends z.ZodType | undefined,
   EndpointArgs extends Record<string, string | string[]> | undefined,
+  ServerSideImports extends (() => Promise<any>) | undefined,
 > = (
-  config: IkkanConfig<Method, Output, Schema, EndpointArgs>,
+  config: IkkanConfig<Method, Output, Schema, EndpointArgs, ServerSideImports>,
   ...supplementaryArgs: any[]
 ) => unknown;
 
-type BranchHandlerParams<
+type SchemaEndpointBranchParams<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
   Schema extends z.ZodType | undefined,
   EndpointArgs extends Record<string, string | string[]> | undefined,
+  ServerSideImports extends (() => Promise<any>) | undefined,
 > = {
-  noSchemaNoEndpoint: HandlerOperator<Method, Output, undefined, undefined>;
+  noSchemaNoEndpoint: HandlerOperator<Method, Output, undefined, undefined, ServerSideImports>;
   noSchemaWithEndpoint: HandlerOperator<
     Method,
     Output,
     undefined,
-    Exclude<EndpointArgs, undefined>
+    Exclude<EndpointArgs, undefined>,
+    ServerSideImports
   >;
   bodyParamsNoEndpoint: HandlerOperator<
     Method,
     Output,
     Exclude<Schema, undefined>,
-    undefined
+    undefined,
+    ServerSideImports
   >;
   bodyParamsWithEndpoint: HandlerOperator<
     Method,
     Output,
     Exclude<Schema, undefined>,
-    Exclude<EndpointArgs, undefined>
+    Exclude<EndpointArgs, undefined>,
+    ServerSideImports
   >;
   searchParamsNoEndpoint: HandlerOperator<
     Method,
     Output,
     Exclude<Schema, undefined>,
-    undefined
+    undefined,
+    ServerSideImports
   >;
   searchParamsWithEndpoint: HandlerOperator<
     Method,
     Output,
     Exclude<Schema, undefined>,
-    Exclude<EndpointArgs, undefined>
+    Exclude<EndpointArgs, undefined>,
+    ServerSideImports
   >;
 };
 
-const METHODS_BODY_PARAMS = ["POST", "PUT", "PATCH"];
-const METHODS_SEARCH_PARAMS = ["GET", "DELETE", "HEAD", "OPTIONS"];
+export const METHODS_BODY_PARAMS = ["POST", "PUT", "PATCH"];
+export const METHODS_SEARCH_PARAMS = ["GET", "DELETE", "HEAD", "OPTIONS"];
 
-export function branchHandler<
+export function schemaEndpointBranch<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
   Schema extends z.ZodType | undefined,
   EndpointArgs extends Record<string, string | string[]> | undefined,
+  ServerSideImports extends (() => Promise<any>) | undefined,
 >(
-  config: IkkanConfig<Method, Output, Schema, EndpointArgs>,
+  config: IkkanConfig<Method, Output, Schema, EndpointArgs, ServerSideImports>,
   supplementaryArgs: unknown[],
-  branches: BranchHandlerParams<Method, Output, Schema, EndpointArgs>,
+  branches: SchemaEndpointBranchParams<Method, Output, Schema, EndpointArgs, ServerSideImports>,
 ) {
   const { endpoint, method } = config;
 

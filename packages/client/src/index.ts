@@ -17,9 +17,10 @@ export function ikkanClientBridge<
   Output extends JsonValue,
   Schema extends z.ZodType | undefined,
   EndpointArgs extends Record<string, string | string[]> | undefined,
+  ServerSideImports extends (() => Promise<any>) | undefined,
   T extends JsonValue[],
 >(
-  config: IkkanConfig<Method, Output, Schema, EndpointArgs>,
+  config: IkkanConfig<Method, Output, Schema, EndpointArgs, ServerSideImports>,
   sideEffects: IkkanSideEffects<T, Output, Schema, EndpointArgs> = [] as any,
 ): IkkanClientBridgeHandler<Method, Output, Schema, EndpointArgs> {
   const hook = ikkanBridgeWithState(config, sideEffects);

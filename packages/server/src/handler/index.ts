@@ -1,14 +1,15 @@
 import { z } from "zod";
-import { ikkanHandlerSearchParams } from "./handlerSearchParams";
-import { ikkanHandlerBodyParams } from "./handlerBodyParams";
+import { ikkanHandlerSearchParamsNoSSI, ikkanHandlerSearchParamsWithSSI } from "./handlerSearchParams";
+import { ikkanHandlerBodyParamsNoSSI, ikkanHandlerBodyParamsWithSSI } from "./handlerBodyParams";
+import { ikkanHandlerNoSchemaNoSSI, ikkanHandlerNoSchemaWithSSI } from "./handlerNoSchema";
 import {
   JsonValue,
+  METHODS_BODY_PARAMS,
+  METHODS_SEARCH_PARAMS,
   NextHTTPMethod,
   NextHandler,
-  branchHandler,
 } from "@ikkan/core";
 import { IkkanConfig } from "@ikkan/core";
-import { ikkanHandlerNoSchema } from "./handlerNoSchema";
 
 type IkkanHandlerExport<
   Method extends NextHTTPMethod,
@@ -17,25 +18,51 @@ type IkkanHandlerExport<
   [key in Uppercase<Method>]: NextHandler<Output>
 }
 
-export function ikkanHandler<
+export async function ikkanHandler<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
-  Schema extends z.ZodType | undefined = undefined,
+  Schema extends z.ZodType | undefined,
   EndpointArgs extends
     | Record<string, string | string[]>
-    | undefined = undefined,
+    | undefined,
+  ServerSideImports extends (() => Promise<any>) | undefined,
 >(
-  config: IkkanConfig<Method, Output, Schema, EndpointArgs>,
-): IkkanHandlerExport<Method, Output> {
+  config: IkkanConfig<Method, Output, Schema, EndpointArgs, ServerSideImports>,
+): Promise<IkkanHandlerExport<Method, Output>> {
   const { method } = config;
-  const handler = branchHandler(config, [], {
-    noSchemaNoEndpoint: ikkanHandlerNoSchema,
-    noSchemaWithEndpoint: ikkanHandlerNoSchema,
-    bodyParamsNoEndpoint: ikkanHandlerBodyParams,
-    bodyParamsWithEndpoint: ikkanHandlerBodyParams,
-    searchParamsNoEndpoint: ikkanHandlerSearchParams,
-    searchParamsWithEndpoint: ikkanHandlerSearchParams,
-  });
+  if ("ssi" in config) {
+    if ("schema" in config) {
+      if (METHODS_BODY_PARAMS.includes(method)) {
+        const handler = await ikkanHandlerBodyParamsWithSSI(config as any)
+        return { [method.toUpperCase()]: handler } as IkkanHandlerExport<Method, Output>;
+      }
 
-  return { [method.toUpperCase()]: handler } as IkkanHandlerExport<Method, Output>;
+      if (METHODS_SEARCH_PARAMS.includes(method)) {
+        const handler = await ikkanHandlerSearchParamsWithSSI(config as any)
+        return { [method.toUpperCase()]: handler } as IkkanHandlerExport<Method, Output>;
+      }
+
+      throw new Error("Invalid method");
+    } else {
+      const handler = await ikkanHandlerNoSchemaWithSSI(config as any)
+      return { [method.toUpperCase()]: handler } as IkkanHandlerExport<Method, Output>;
+    }
+  } else {
+    if ("schema" in config) {
+      if (METHODS_BODY_PARAMS.includes(method)) {
+        const handler = await ikkanHandlerBodyParamsNoSSI(config as any)
+        return { [method.toUpperCase()]: handler } as IkkanHandlerExport<Method, Output>;
+      }
+
+      if (METHODS_SEARCH_PARAMS.includes(method)) {
+        const handler = await ikkanHandlerSearchParamsNoSSI(config as any)
+        return { [method.toUpperCase()]: handler } as IkkanHandlerExport<Method, Output>;
+      }
+
+      throw new Error("Invalid method");
+    } else {
+      const handler = await ikkanHandlerNoSchemaNoSSI(config as any)
+      return { [method.toUpperCase()]: handler } as IkkanHandlerExport<Method, Output>;
+    }
+  }
 }

@@ -16,7 +16,8 @@ export function ikkanServerBridgeSearchParamsNoEndpoint<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
   Schema extends z.ZodType,
->(config: IkkanConfig<Method, Output, Schema, undefined>) {
+  ServerSideImports extends (() => Promise<any>) | undefined,
+>(config: IkkanConfig<Method, Output, Schema, undefined, ServerSideImports>) {
   const { endpoint, method } = config;
 
   const fetcher = makeFetcherSearchParamsNoEndpoint<Method, Output, Schema>(
@@ -36,7 +37,8 @@ export function ikkanServerBridgeSearchParamsWithEndpoint<
   Output extends JsonValue,
   Schema extends z.ZodType,
   EndpointArgs extends Record<string, string | string[]>,
->(config: IkkanConfig<Method, Output, Schema, EndpointArgs>) {
+  ServerSideImports extends (() => Promise<any>) | undefined,
+>(config: IkkanConfig<Method, Output, Schema, EndpointArgs, ServerSideImports>) {
   const { endpoint, method } = config;
 
   const fetcher = makeFetcherSearchParamsWithEndpoint<

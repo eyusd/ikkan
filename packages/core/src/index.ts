@@ -15,8 +15,9 @@ export function ikkanConfig<
   EndpointArgs extends
     | Record<string, string | string[]>
     | undefined = undefined,
+    ServerSideImports extends (() => Promise<any>) | undefined = undefined,
 >(
-  config: IkkanConfig<Method, Output, Schema, EndpointArgs>,
-): IkkanConfig<Method, Output, Schema, EndpointArgs> {
+  config: IkkanConfig<Method, Output, Schema, EndpointArgs, ServerSideImports>,
+): IkkanConfig<Method, Output, Schema, EndpointArgs, ServerSideImports> {
   return config;
 }

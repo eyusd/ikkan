@@ -128,18 +128,21 @@ export function sideEffect<
   ToOutput extends JsonValue,
   ToSchema extends z.ZodType | undefined,
   ToEndpointArgs extends Record<string, string | string[]> | undefined,
+  ToServerSideImports extends (() => Promise<any>) | undefined,
   FromMethod extends NextHTTPMethod,
   FromOutput extends JsonValue,
   FromSchema extends z.ZodType | undefined,
   FromEndpointArgs extends Record<string, string | string[]> | undefined,
+  FromServerSideImports extends (() => Promise<any>) | undefined
 >(
   fromConfig: IkkanConfig<
     FromMethod,
     FromOutput,
     FromSchema,
-    FromEndpointArgs
+    FromEndpointArgs,
+    FromServerSideImports
   >,
-  toConfig: IkkanConfig<ToMethod, ToOutput, ToSchema, ToEndpointArgs>,
+  toConfig: IkkanConfig<ToMethod, ToOutput, ToSchema, ToEndpointArgs, ToServerSideImports>,
 ) {
   const { endpoint: otherEndpoint } = toConfig;
   switch (otherEndpoint.length) {

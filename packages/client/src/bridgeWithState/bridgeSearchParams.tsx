@@ -14,9 +14,10 @@ export function bridgeSearchParamsNoEndpoint<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
   Schema extends z.ZodType,
+  ServerSideImports extends (() => Promise<any>) | undefined,
   T extends JsonValue[],
 >(
-  config: IkkanConfig<Method, Output, Schema, undefined>,
+  config: IkkanConfig<Method, Output, Schema, undefined, ServerSideImports>,
   sideEffects: IkkanSideEffects<T, Output, Schema, undefined>,
 ) {
   const { endpoint, method } = config;
@@ -33,9 +34,10 @@ export function bridgeSearchParamsWithEndpoint<
   Output extends JsonValue,
   Schema extends z.ZodType,
   EndpointArgs extends Record<string, string | string[]>,
+  ServerSideImports extends (() => Promise<any>) | undefined,
   T extends JsonValue[],
 >(
-  config: IkkanConfig<Method, Output, Schema, EndpointArgs>,
+  config: IkkanConfig<Method, Output, Schema, EndpointArgs, ServerSideImports>,
   sideEffects: IkkanSideEffects<T, Output, Schema, EndpointArgs>,
 ) {
   const { endpoint, method } = config;

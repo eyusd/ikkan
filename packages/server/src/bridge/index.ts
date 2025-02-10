@@ -1,5 +1,5 @@
 import {
-  branchHandler,
+  schemaEndpointBranch,
   IkkanConfig,
   JsonValue,
   NextHTTPMethod,
@@ -25,10 +25,11 @@ export function ikkanServerBridge<
   Output extends JsonValue,
   Schema extends z.ZodType | undefined,
   EndpointArgs extends Record<string, string | string[]> | undefined,
+  ServerSideImports extends (() => Promise<any>) | undefined,
 >(
-  config: IkkanConfig<Method, Output, Schema, EndpointArgs>,
+  config: IkkanConfig<Method, Output, Schema, EndpointArgs, ServerSideImports>,
 ): IkkanServerBridgeHandler<Output, Schema, EndpointArgs> {
-  const handler = branchHandler(config, [], {
+  const handler = schemaEndpointBranch(config, [], {
     noSchemaNoEndpoint: ikkanServerBridgeNoSchemaNoEndpoint,
     noSchemaWithEndpoint: ikkanServerBridgeNoSchemaWithEndpoint,
     bodyParamsNoEndpoint: ikkanServerBridgeBodyParamsNoEndpoint,

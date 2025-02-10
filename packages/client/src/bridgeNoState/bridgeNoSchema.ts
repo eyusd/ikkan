@@ -13,9 +13,10 @@ import { clientHookNoEndpoint, clientHookWithEndpoint } from "src/utils";
 export function bridgeNoSchemaNoEndpoint<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
+  ServerSideImports extends (() => Promise<any>) | undefined,
   T extends JsonValue[],
 >(
-  config: IkkanConfig<Method, Output, undefined, undefined>,
+  config: IkkanConfig<Method, Output, undefined, undefined, ServerSideImports>,
   sideEffects: IkkanSideEffects<T, Output, undefined, undefined>,
 ) {
   const { endpoint, method } = config;
@@ -36,9 +37,10 @@ export function bridgeNoSchemaWithEndpoint<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
   EndpointArgs extends Record<string, string | string[]>,
+  ServerSideImports extends (() => Promise<any>) | undefined,
   T extends JsonValue[],
 >(
-  config: IkkanConfig<Method, Output, undefined, EndpointArgs>,
+  config: IkkanConfig<Method, Output, undefined, EndpointArgs, ServerSideImports>,
   sideEffects: IkkanSideEffects<T, Output, undefined, EndpointArgs>,
 ) {
   const { endpoint, method } = config;

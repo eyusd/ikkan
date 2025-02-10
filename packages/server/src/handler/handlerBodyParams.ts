@@ -23,20 +23,45 @@ async function parseBodyGuard<T extends z.ZodType>(
   }
 }
 
-export function ikkanHandlerBodyParams<
+export async function ikkanHandlerBodyParamsNoSSI<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
   Schema extends z.ZodType,
   EndpointArgs extends Record<string, string | string[]> | undefined,
+  ServerSideImports extends undefined,
 >(
-  config: IkkanConfig<Method, Output, Schema, EndpointArgs>,
-): NextHandler<Output> {
+  config: IkkanConfig<Method, Output, Schema, EndpointArgs, ServerSideImports>,
+): Promise<NextHandler<Output>> {
   const { schema, fn } = config;
   return async (req, { params: context }) => {
     try {
       const params = await parseBodyGuard(req, schema);
       const segments = await context;
       return NextResponse.json(await fn(req, params, segments), {
+        status: 200,
+      });
+    } catch (error) {
+      return handleError(error);
+    }
+  };
+}
+
+export async function ikkanHandlerBodyParamsWithSSI<
+  Method extends NextHTTPMethod,
+  Output extends JsonValue,
+  Schema extends z.ZodType,
+  EndpointArgs extends Record<string, string | string[]> | undefined,
+  ServerSideImports extends (() => Promise<any>),
+>(
+  config: IkkanConfig<Method, Output, Schema, EndpointArgs, ServerSideImports>,
+): Promise<NextHandler<Output>> {
+  const { schema, fn, ssi } = config;
+  const imports = await ssi();
+  return async (req, { params: context }) => {
+    try {
+      const params = await parseBodyGuard(req, schema);
+      const segments = await context;
+      return NextResponse.json(await fn(req, params, segments, imports), {
         status: 200,
       });
     } catch (error) {
