@@ -1,5 +1,11 @@
 # @ikkan/core
 
+## 3.1.1
+
+### Patch Changes
+
+- Added docs
+
 ## 3.1.0
 
 ### Minor Changes

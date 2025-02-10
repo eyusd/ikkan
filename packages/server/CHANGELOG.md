@@ -1,5 +1,13 @@
 # @ikkan/server
 
+## 3.1.1
+
+### Patch Changes
+
+- Added docs
+- Updated dependencies
+  - @ikkan/core@3.1.1
+
 ## 3.1.0
 
 ### Minor Changes

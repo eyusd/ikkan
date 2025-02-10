@@ -27,6 +27,20 @@ type IkkanHandlerExport<
   [key in Uppercase<Method>]: NextHandler<Output>;
 };
 
+/**
+ * Turns an Ikkan configuration object into a proper Next API route handler.
+ *
+ * @template Method - The HTTP method type.
+ * @template Output - The type of the output JSON value.
+ * @template Schema - The Zod schema type or undefined.
+ * @template EndpointArgs - The type of endpoint arguments or undefined.
+ * @template ServerSideImports - The type of server-side imports or undefined.
+ *
+ * @param {IkkanConfig<Method, Output, Schema, EndpointArgs, ServerSideImports>} config - The configuration object for the Ikkan handler.
+ * @returns {Promise<IkkanHandlerExport<Method, Output>>} - A promise that resolves to the Ikkan handler export.
+ *
+ * @throws {Error} If the method is invalid.
+ */
 export async function ikkanHandler<
   Method extends NextHTTPMethod,
   Output extends JsonValue,

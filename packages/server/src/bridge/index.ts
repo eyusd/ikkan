@@ -20,6 +20,19 @@ import {
 } from "./bridgeSearchParams";
 
 export { type IkkanSchema } from "./types";
+
+/**
+ * Turns an Ikkan configuration object into a server bridge handler.
+ *
+ * @template Method - The HTTP method type (e.g., GET, POST).
+ * @template Output - The type of the output JSON value.
+ * @template Schema - The Zod schema type for validation, or undefined if no schema is used.
+ * @template EndpointArgs - The type of endpoint arguments, or undefined if no arguments are used.
+ * @template ServerSideImports - The type of server-side imports, or undefined if no imports are used.
+ *
+ * @param {IkkanConfig<Method, Output, Schema, EndpointArgs, ServerSideImports>} config - The configuration object for the server bridge.
+ * @returns {IkkanServerBridgeHandler<Output, Schema, EndpointArgs>} The server bridge handler.
+ */
 export function ikkanServerBridge<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
