@@ -7,17 +7,27 @@ import { format, parseISO } from "date-fns";
 import { deleteTask, useGetTask } from "@/app/api/tasks/[id]/(default)/bridge";
 import { TaskLoading } from "./task-loading";
 import { useState } from "react";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { taskName } from "@/app/api/tasks/[id]/name/bridge";
 import { taskContent } from "@/app/api/tasks/[id]/content/bridge";
 import { taskTag } from "@/app/api/tasks/[id]/tag/bridge";
 import { taskDate } from "@/app/api/tasks/[id]/date/bridge";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { InputBlur } from "./input-blur";
 import { TextareaBlur } from "./textarea-blur";
-
 
 type TaskProps = {
   id: string;
@@ -35,31 +45,26 @@ export function Task({ id }: TaskProps) {
   if (error || data === null) {
     return <div>Error</div>;
   }
-  
+
   if (data === undefined) {
-    return (
-      <TaskLoading />
-    );
+    return <TaskLoading />;
   }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-
         <Card className="p-3 hover:bg-accent" onClick={() => setOpen(true)}>
-          <h3 className="font-medium truncate">
-            { data.name }
-          </h3>
+          <h3 className="font-medium truncate">{data.name}</h3>
           <div className="mt-2">
             <span className="inline-block rounded bg-green-100 px-2 py-0.5 text-xs text-green-700">
-              { data.tag }
+              {data.tag}
             </span>
           </div>
           <div className="mt-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="flex items-center gap-1 text-xs text-gray-500">
-                <List className="h-3 w-3" /> 
-                { data.content.split("\n").length }
+                <List className="h-3 w-3" />
+                {data.content.split("\n").length}
               </span>
               <span className="flex items-center gap-1 text-xs text-gray-500">
                 <CalendarIcon className="h-3 w-3" />
@@ -103,12 +108,14 @@ export function Task({ id }: TaskProps) {
             <Calendar
               mode="single"
               selected={parseISO(data.date)}
-              onSelect={(date) => postTaskDate({ date: date?.toISOString() ?? "" })}
+              onSelect={(date) =>
+                postTaskDate({ date: date?.toISOString() ?? "" })
+              }
             />
           </PopoverContent>
         </Popover>
         <DialogFooter>
-          <Button 
+          <Button
             variant="destructive"
             onClick={async () => {
               await del();

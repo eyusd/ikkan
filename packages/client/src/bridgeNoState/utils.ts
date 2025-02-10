@@ -9,5 +9,7 @@ export function makeTransform<
   return (partializedFetcher: IkkanFetcher<Output, Schema, undefined>) =>
     ({
       [method.toLowerCase()]: partializedFetcher,
-    }) as { [key in Lowercase<Method>]: IkkanFetcher<Output, Schema, undefined> };
+    }) as {
+      [key in Lowercase<Method>]: IkkanFetcher<Output, Schema, undefined>;
+    };
 }

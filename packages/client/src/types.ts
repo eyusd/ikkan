@@ -14,8 +14,17 @@ export type IkkanClientBridgeHandler<
 };
 
 export type IkkanSchema<T> = T extends
-  | IkkanClientBridgeWithStateHook<infer _Output, infer Schema, infer _EndpointArgs>
-  | IkkanClientBridgeNoStateHook<infer _Method, infer _Output, infer Schema, infer _EndpointArgs>
+  | IkkanClientBridgeWithStateHook<
+      infer _Output,
+      infer Schema,
+      infer _EndpointArgs
+    >
+  | IkkanClientBridgeNoStateHook<
+      infer _Method,
+      infer _Output,
+      infer Schema,
+      infer _EndpointArgs
+    >
   ? Schema extends z.ZodType
     ? Schema
     : never

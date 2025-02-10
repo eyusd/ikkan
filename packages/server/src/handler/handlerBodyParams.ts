@@ -51,7 +51,7 @@ export async function ikkanHandlerBodyParamsWithSSI<
   Output extends JsonValue,
   Schema extends z.ZodType,
   EndpointArgs extends Record<string, string | string[]> | undefined,
-  ServerSideImports extends (() => Promise<any>),
+  ServerSideImports extends () => Promise<any>,
 >(
   config: IkkanConfig<Method, Output, Schema, EndpointArgs, ServerSideImports>,
 ): Promise<NextHandler<Output>> {

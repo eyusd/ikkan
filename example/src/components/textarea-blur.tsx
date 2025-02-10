@@ -4,7 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 type DebouncedTextareaProps = {
   defaultValue: string;
   onBlur: (value: string) => void;
-}
+};
 
 export function TextareaBlur({ defaultValue, onBlur }: DebouncedTextareaProps) {
   const [value, setValue] = useState(defaultValue);

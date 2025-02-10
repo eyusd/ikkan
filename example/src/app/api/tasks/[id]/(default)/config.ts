@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { ikkanConfig } from "@ikkan/core";
 
 export const getConfig = ikkanConfig({
-  endpoint: ({ id }: { id: string}) => `/api/tasks/${id}`,
+  endpoint: ({ id }: { id: string }) => `/api/tasks/${id}`,
   method: "GET",
   fn: async (_req, { id }) => {
     return await prisma.task.findUnique({
@@ -10,11 +10,11 @@ export const getConfig = ikkanConfig({
         id: parseInt(id),
       },
     });
-  }
-})
+  },
+});
 
 export const deleteConfig = ikkanConfig({
-  endpoint: ({ id }: { id: string}) => `/api/tasks/${id}`,
+  endpoint: ({ id }: { id: string }) => `/api/tasks/${id}`,
   method: "DELETE",
   fn: async (_req, { id }) => {
     return await prisma.task.delete({
@@ -22,5 +22,5 @@ export const deleteConfig = ikkanConfig({
         id: parseInt(id),
       },
     });
-  }
-})
+  },
+});

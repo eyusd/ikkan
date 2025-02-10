@@ -38,7 +38,9 @@ export function ikkanServerBridgeBodyParamsWithEndpoint<
   Schema extends z.ZodType,
   EndpointArgs extends Record<string, string | string[]>,
   ServerSideImports extends (() => Promise<any>) | undefined,
->(config: IkkanConfig<Method, Output, Schema, EndpointArgs, ServerSideImports>) {
+>(
+  config: IkkanConfig<Method, Output, Schema, EndpointArgs, ServerSideImports>,
+) {
   const { endpoint, method } = config;
 
   const fetcher = makeFetcherBodyParamsWithEndpoint<

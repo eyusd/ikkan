@@ -23,7 +23,7 @@ export function partializeFetcherWithEndpoint<
     return async function fetcherPartialized(
       ...params: IkkanFetcherParams<Schema, undefined>
     ): Promise<Output> {
-      return await fetcher(...[args, ...params] as any);
+      return await fetcher(...([args, ...params] as any));
     } as IkkanFetcher<Output, Schema, undefined>;
   };
 }

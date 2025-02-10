@@ -20,7 +20,13 @@ type SchemaEndpointBranchParams<
   EndpointArgs extends Record<string, string | string[]> | undefined,
   ServerSideImports extends (() => Promise<any>) | undefined,
 > = {
-  noSchemaNoEndpoint: HandlerOperator<Method, Output, undefined, undefined, ServerSideImports>;
+  noSchemaNoEndpoint: HandlerOperator<
+    Method,
+    Output,
+    undefined,
+    undefined,
+    ServerSideImports
+  >;
   noSchemaWithEndpoint: HandlerOperator<
     Method,
     Output,
@@ -70,7 +76,13 @@ export function schemaEndpointBranch<
 >(
   config: IkkanConfig<Method, Output, Schema, EndpointArgs, ServerSideImports>,
   supplementaryArgs: unknown[],
-  branches: SchemaEndpointBranchParams<Method, Output, Schema, EndpointArgs, ServerSideImports>,
+  branches: SchemaEndpointBranchParams<
+    Method,
+    Output,
+    Schema,
+    EndpointArgs,
+    ServerSideImports
+  >,
 ) {
   const { endpoint, method } = config;
 

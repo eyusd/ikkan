@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 type DebouncedInputProps = {
   defaultValue: string;
   onBlur: (value: string) => void;
-}
+};
 
 export function InputBlur({ defaultValue, onBlur }: DebouncedInputProps) {
   const [value, setValue] = useState(defaultValue);

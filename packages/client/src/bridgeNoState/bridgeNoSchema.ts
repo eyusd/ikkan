@@ -40,7 +40,13 @@ export function bridgeNoSchemaWithEndpoint<
   ServerSideImports extends (() => Promise<any>) | undefined,
   T extends JsonValue[],
 >(
-  config: IkkanConfig<Method, Output, undefined, EndpointArgs, ServerSideImports>,
+  config: IkkanConfig<
+    Method,
+    Output,
+    undefined,
+    EndpointArgs,
+    ServerSideImports
+  >,
   sideEffects: IkkanSideEffects<T, Output, undefined, EndpointArgs>,
 ) {
   const { endpoint, method } = config;

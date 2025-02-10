@@ -13,7 +13,13 @@ export async function ikkanHandlerNoSchemaNoSSI<
   EndpointArgs extends Record<string, string | string[]> | undefined,
   ServerSideImports extends undefined,
 >(
-  config: IkkanConfig<Method, Output, undefined, EndpointArgs, ServerSideImports>,
+  config: IkkanConfig<
+    Method,
+    Output,
+    undefined,
+    EndpointArgs,
+    ServerSideImports
+  >,
 ): Promise<NextHandler<Output>> {
   const { fn } = config;
   return async (req, { params: context }) => {
@@ -32,14 +38,22 @@ export async function ikkanHandlerNoSchemaWithSSI<
   EndpointArgs extends Record<string, string | string[]> | undefined,
   ServerSideImports extends () => Promise<any>,
 >(
-  config: IkkanConfig<Method, Output, undefined, EndpointArgs, ServerSideImports>,
+  config: IkkanConfig<
+    Method,
+    Output,
+    undefined,
+    EndpointArgs,
+    ServerSideImports
+  >,
 ): Promise<NextHandler<Output>> {
   const { fn, ssi } = config;
   const imports = await ssi();
   return async (req, { params: context }) => {
     try {
       const segments = await context;
-      return NextResponse.json(await fn(req, segments, imports), { status: 200 });
+      return NextResponse.json(await fn(req, segments, imports), {
+        status: 200,
+      });
     } catch (error) {
       return handleError(error);
     }

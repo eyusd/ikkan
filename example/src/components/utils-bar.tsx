@@ -7,7 +7,7 @@ export function UtilsBar() {
     <div className="flex items-center gap-2 p-4">
       <div className="relative flex-1">
         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-        <Input className="pl-8" placeholder="Search items" disabled/>
+        <Input className="pl-8" placeholder="Search items" disabled />
       </div>
       <Button variant="default" className="gap-2" disabled>
         <Plus className="h-4 w-4" />

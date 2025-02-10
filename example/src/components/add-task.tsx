@@ -1,7 +1,7 @@
 "use client";
 
 import { addTask } from "@/app/api/columns/[id]/add-task/bridge";
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -10,16 +10,28 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { CalendarIcon, Plus } from "lucide-react";
-import { useForm } from "react-hook-form"
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IkkanSchema } from "@ikkan/client";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { format, formatISO, parseISO } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
@@ -40,23 +52,30 @@ export function AddTask({ id }: AddTaskProps) {
   };
 
   const form = useForm<z.infer<Schema>>({
-    resolver: zodResolver(z.object({
-      name: z.string(),
-      content: z.string(),
-      tag: z.string(),
-      date: z.string(),
-    }) satisfies Schema),
+    resolver: zodResolver(
+      z.object({
+        name: z.string(),
+        content: z.string(),
+        tag: z.string(),
+        date: z.string(),
+      }) satisfies Schema,
+    ),
     defaultValues: {
       name: undefined,
       content: "",
       tag: "nextjs",
       date: formatISO(new Date()),
-    }
+    },
   });
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setOpen(true)}>
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-7 w-7"
+        onClick={() => setOpen(true)}
+      >
         <Plus className="h-4 w-4" />
       </Button>
       <DialogContent className="sm:max-w-[425px]">
@@ -91,7 +110,7 @@ export function AddTask({ id }: AddTaskProps) {
                 <FormItem>
                   <FormLabel>Description</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="" {...field}/>
+                    <Textarea placeholder="" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -104,7 +123,7 @@ export function AddTask({ id }: AddTaskProps) {
                 <FormItem>
                   <FormLabel>Tag</FormLabel>
                   <FormControl>
-                    <Input placeholder="Some tag" {...field}/>
+                    <Input placeholder="Some tag" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -122,18 +141,29 @@ export function AddTask({ id }: AddTaskProps) {
                           variant={"outline"}
                           className={cn(
                             "justify-start text-left font-normal w-1/2",
-                            !field.value && "text-muted-foreground"
+                            !field.value && "text-muted-foreground",
                           )}
                         >
                           <CalendarIcon />
-                          {field.value ? format(parseISO(field.value), "PPP") : <span>Pick a date</span>}
+                          {field.value ? (
+                            format(parseISO(field.value), "PPP")
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0">
                         <Calendar
                           mode="single"
-                          selected={field.value ? parseISO(field.value) : undefined}
-                          onSelect={(date) => form.setValue("date", date ? date.toISOString() : "")}
+                          selected={
+                            field.value ? parseISO(field.value) : undefined
+                          }
+                          onSelect={(date) =>
+                            form.setValue(
+                              "date",
+                              date ? date.toISOString() : "",
+                            )
+                          }
                         />
                       </PopoverContent>
                     </Popover>
@@ -143,10 +173,7 @@ export function AddTask({ id }: AddTaskProps) {
               )}
             />
             <DialogFooter>
-              <Button 
-                type="submit" 
-                disabled={!form.formState.isValid}
-              >
+              <Button type="submit" disabled={!form.formState.isValid}>
                 Save
               </Button>
             </DialogFooter>
@@ -154,5 +181,5 @@ export function AddTask({ id }: AddTaskProps) {
         </Form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

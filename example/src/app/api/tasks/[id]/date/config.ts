@@ -3,7 +3,7 @@ import { ikkanConfig } from "@ikkan/core";
 import { z } from "zod";
 
 export const config = ikkanConfig({
-  endpoint: ({ id }: { id: string}) => `/api/tasks/${id}/date`,
+  endpoint: ({ id }: { id: string }) => `/api/tasks/${id}/date`,
   method: "POST",
   schema: z.object({
     date: z.string(),
@@ -19,5 +19,5 @@ export const config = ikkanConfig({
       },
     });
     return task;
-  }
-})
+  },
+});

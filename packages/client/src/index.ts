@@ -1,8 +1,4 @@
-import {
-  IkkanConfig,
-  JsonValue,
-  NextHTTPMethod,
-} from "@ikkan/core";
+import { IkkanConfig, JsonValue, NextHTTPMethod } from "@ikkan/core";
 import { z } from "zod";
 import { IkkanClientBridgeHandler } from "./types";
 import { ikkanBridgeWithState } from "./bridgeWithState";

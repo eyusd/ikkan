@@ -33,35 +33,35 @@ export type IkkanConfig<
               req: NextRequest,
               params: z.infer<Schema>,
               segments: NextDynamicSegments<EndpointArgs>,
-              imports: Awaited<ReturnType<ServerSideImports>>
+              imports: Awaited<ReturnType<ServerSideImports>>,
             ) => Promise<Output>
           : (
               req: NextRequest,
               params: z.infer<Schema>,
-              segments: NextDynamicSegments<EndpointArgs>
+              segments: NextDynamicSegments<EndpointArgs>,
             ) => Promise<Output>
         : ServerSideImports extends () => Promise<any>
           ? (
               req: NextRequest,
               segments: NextDynamicSegments<EndpointArgs>,
-              imports: Awaited<ReturnType<ServerSideImports>>
+              imports: Awaited<ReturnType<ServerSideImports>>,
             ) => Promise<Output>
           : (
               req: NextRequest,
-              segments: NextDynamicSegments<EndpointArgs>
+              segments: NextDynamicSegments<EndpointArgs>,
             ) => Promise<Output>
       : Schema extends z.ZodType
         ? ServerSideImports extends () => Promise<any>
           ? (
               req: NextRequest,
               params: z.infer<Schema>,
-              imports: Awaited<ReturnType<ServerSideImports>>
+              imports: Awaited<ReturnType<ServerSideImports>>,
             ) => Promise<Output>
           : (req: NextRequest, params: z.infer<Schema>) => Promise<Output>
         : ServerSideImports extends () => Promise<any>
           ? (
               req: NextRequest,
-              imports: Awaited<ReturnType<ServerSideImports>>
+              imports: Awaited<ReturnType<ServerSideImports>>,
             ) => Promise<Output>
           : (req: NextRequest) => Promise<Output>;
   };

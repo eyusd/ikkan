@@ -56,7 +56,11 @@ export function clientHookNoEndpoint<
         const response = await (
           fetcher as IkkanFetcher<Output, Schema, undefined>
         )(...params);
-        const fullArgs = { output: response, params, args: undefined } as FullArgs<Output, Schema, undefined>;
+        const fullArgs = {
+          output: response,
+          params,
+          args: undefined,
+        } as FullArgs<Output, Schema, undefined>;
         await applySideEffects(fullArgs, sideEffects);
         return response;
       } catch (error) {
@@ -87,8 +91,12 @@ export function clientHookWithEndpoint<
       ...params: IkkanFetcherParams<Schema, undefined>
     ): Promise<Output> => {
       try {
-        const response = await fetcher(...[args, ...params] as any);
-        const fullArgs = { output: response, params, args } as FullArgs<Output, Schema, EndpointArgs>
+        const response = await fetcher(...([args, ...params] as any));
+        const fullArgs = { output: response, params, args } as FullArgs<
+          Output,
+          Schema,
+          EndpointArgs
+        >;
         await applySideEffects(fullArgs, sideEffects);
         return response;
       } catch (error) {
