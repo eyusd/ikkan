@@ -1,5 +1,14 @@
 # example
 
+## 1.0.1
+
+### Patch Changes
+
+- Updated dependencies
+  - @ikkan/client@3.1.0
+  - @ikkan/core@3.1.0
+  - @ikkan/server@3.1.0
+
 ## 1.0.0
 
 ### Major Changes

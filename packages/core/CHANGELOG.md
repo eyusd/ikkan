@@ -1,5 +1,11 @@
 # @ikkan/core
 
+## 3.1.0
+
+### Minor Changes
+
+- Add server side imports
+
 ## 3.0.0
 
 ### Major Changes
