@@ -1,5 +1,11 @@
 # @ikkan/core
 
+## 3.1.2
+
+### Patch Changes
+
+- Update package.json
+
 ## 3.1.1
 
 ### Patch Changes

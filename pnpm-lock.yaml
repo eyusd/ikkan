@@ -130,43 +130,42 @@ importers:
   packages/@meta: {}
 
   packages/client:
-    dependencies:
+    devDependencies:
       '@ikkan/core':
         specifier: workspace:*
         version: link:../core
+      '@types/react':
+        specifier: ^16.11.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+        version: 19.0.8
       react:
-        specifier: ^19.0.0
+        specifier: ^16.11.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
         version: 19.0.0
       swr:
         specifier: ^2.3.0
         version: 2.3.0(react@19.0.0)
       zod:
-        specifier: ^3.24.1
+        specifier: ^3.0.0
         version: 3.24.1
-    devDependencies:
-      '@types/react':
-        specifier: ^19
-        version: 19.0.8
 
   packages/core:
-    dependencies:
+    devDependencies:
       next:
-        specifier: ^15.1.6
+        specifier: ^15.0.0
         version: 15.1.6(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       zod:
-        specifier: ^3.24.1
+        specifier: ^3.0.0
         version: 3.24.1
 
   packages/server:
-    dependencies:
+    devDependencies:
       '@ikkan/core':
         specifier: workspace:*
         version: link:../core
       next:
-        specifier: ^15.1.6
+        specifier: ^15.0.0
         version: 15.1.6(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       zod:
-        specifier: ^3.24.1
+        specifier: ^3.0.0
         version: 3.24.1
 
 packages:
@@ -1785,11 +1784,6 @@ packages:
 
   scheduler@0.25.0:
     resolution: {integrity: sha512-xFVuu11jh+xcO7JOAGJNOXld8/TcEHK/4CituBUeUb5hqxJLj9YuemAEuvm9gQ/+pgXYfbQuqAkiYu+u7YEsNA==}
-
-  semver@7.6.3:
-    resolution: {integrity: sha512-oVekP1cKtI+CTDvHWYFUcMtsK/00wmAEfyqKfNdARm8u1wNVhSgaX7A8d4UuIlUI5e84iEwOhs7ZPYRmzU9U6A==}
-    engines: {node: '>=10'}
-    hasBin: true
 
   semver@7.7.0:
     resolution: {integrity: sha512-DrfFnPzblFmNrIZzg5RzHegbiRWg7KMR7btwi2yjHwx06zsUbO5g613sVwEV7FTwmzJu+Io0lJe2GJ3LxqpvBQ==}
@@ -3505,16 +3499,13 @@ snapshots:
 
   scheduler@0.25.0: {}
 
-  semver@7.6.3:
-    optional: true
-
   semver@7.7.0: {}
 
   sharp@0.33.5:
     dependencies:
       color: 4.2.3
       detect-libc: 2.0.3
-      semver: 7.6.3
+      semver: 7.7.0
     optionalDependencies:
       '@img/sharp-darwin-arm64': 0.33.5
       '@img/sharp-darwin-x64': 0.33.5

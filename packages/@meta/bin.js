@@ -1,281 +1,166 @@
 #!/usr/bin/env node
 
-const { execSync } = require('child_process');
-const readline = require('readline');
-const path = require('path');
-const fs = require('fs');
+const { promisify } = require('util');
+const { exec: execCb } = require('child_process');
+const { existsSync } = require('fs');
+const { join } = require('path');
+const { createInterface } = require('readline');
 
-// Regular dependencies
-const dependencies = [
-  '@ikkan/core',
-  '@ikkan/client',
-  '@ikkan/server',
-  'zod',
-  'next',
-  'react',
-  'swr'
-];
+const exec = promisify(execCb);
+const packages = ['@ikkan/core', '@ikkan/client', '@ikkan/server'];
 
-// Dev dependencies
-const devDependencies = [
-  '@types/react'
-];
-
-const rl = readline.createInterface({
+const rl = createInterface({
   input: process.stdin,
   output: process.stdout
 });
 
-function question(query) {
-  return new Promise((resolve) => rl.question(query, resolve));
-}
+const question = (query) => new Promise((resolve) => rl.question(query, resolve));
 
-function detectPackageManager() {
-  const processEnv = process.env._;
-  if (processEnv) {
-    if (processEnv.includes('pnpm')) return 'pnpm';
-    if (processEnv.includes('yarn')) return 'yarn';
-  }
-
-  if (fs.existsSync(path.join(process.cwd(), 'pnpm-lock.yaml'))) return 'pnpm';
-  if (fs.existsSync(path.join(process.cwd(), 'yarn.lock'))) return 'yarn';
-  if (fs.existsSync(path.join(process.cwd(), 'package-lock.json'))) return 'npm';
-
-  return 'npm';
-}
-
-function getPackageInfoCommand(packageManager, packageName) {
-  switch (packageManager) {
-    case 'pnpm':
-      return `pnpm info ${packageName} --json`;
-    case 'yarn':
-      return `yarn info ${packageName} --json`;
-    default:
-      return `npm view ${packageName} --json`;
-  }
-}
-
-function parsePackageInfo(output) {
+async function getPackageInfo(pkg) {
   try {
-    return JSON.parse(output);
-  } catch {
+    const { stdout } = await exec(`npm view ${pkg} --json`);
+    return JSON.parse(stdout);
+  } catch (error) {
+    console.error(`Error getting info for ${pkg}: ${error.message}`);
     return null;
   }
 }
 
-async function getDependencyVersions(packageManager) {
-  const versions = {};
+async function getPeerDependencies(packages) {
+  const allPeerDeps = new Set();
   
-  try {
-    // Get @ikkan/client info
-    const clientOutput = execSync(getPackageInfoCommand(packageManager, '@ikkan/client'), { encoding: 'utf8' });
-    const clientInfo = parsePackageInfo(clientOutput);
-    
-    // Get the latest version number
-    const latestVersion = clientInfo['dist-tags'].latest;
-    versions['@ikkan/client'] = latestVersion;
-    
-    // Get dependencies from the latest version
-    const clientDeps = clientInfo.dependencies || {};
-    const clientDevDeps = clientInfo.devDependencies || {};
-
-    // Extract versions from @ikkan/client dependencies
-    versions['zod'] = clientDeps['zod'] || null;
-    versions['react'] = clientDeps['react'] || null;
-    versions['swr'] = clientDeps['swr'] || null;
-    versions['@types/react'] = clientDevDeps['@types/react'] || null;
-    versions['@ikkan/core'] = clientDeps['@ikkan/core'] || null;
-
-    // Get @ikkan/server info for next version
-    const serverOutput = execSync(getPackageInfoCommand(packageManager, '@ikkan/server'), { encoding: 'utf8' });
-    const serverInfo = parsePackageInfo(serverOutput);
-    const serverDeps = serverInfo.dependencies || {};
-
-    versions['@ikkan/server'] = serverInfo['dist-tags'].latest;
-    versions['next'] = serverDeps['next'] || null;
-
-  } catch (error) {
-    console.error('❌ Error fetching package information:', error.message);
-    console.error('Please ensure you have an internet connection and the packages exist.');
-    process.exit(1);
-  }
-
-  // Remove any ^ or ~ from versions
-  Object.keys(versions).forEach(key => {
-    if (versions[key]) {
-      versions[key] = versions[key].replace(/[\^~]/g, '');
+  for (const pkg of packages) {
+    const info = await getPackageInfo(pkg);
+    if (info && info.peerDependencies) {
+      Object.keys(info.peerDependencies).forEach(dep => allPeerDeps.add(dep));
     }
-  });
-
-  // Log the versions we're going to use
-  console.log('📋 Target versions:');
-  Object.entries(versions).forEach(([pkg, version]) => {
-    console.log(`   ${pkg}: ${version || 'version not found'}`);
-  });
-  console.log();
-
-  return versions;
+  }
+  
+  return Array.from(allPeerDeps);
 }
 
-function getCurrentVersions() {
+function detectPackageManagerFromProcess() {
+  // Check if running through npx, pnpm dlx, yarn dlx, or bunx
+  const processPath = process.env._;
+  if (!processPath) return null;
+
+  if (processPath.includes('pnpm')) return 'pnpm';
+  if (processPath.includes('yarn')) return 'yarn';
+  if (processPath.includes('bun')) return 'bun';
+  if (processPath.includes('npm') || processPath.includes('npx')) return 'npm';
+
+  // Check for npm_config_user_agent
+  if (process.env.npm_config_user_agent) {
+    const userAgent = process.env.npm_config_user_agent.toLowerCase();
+    if (userAgent.includes('pnpm')) return 'pnpm';
+    if (userAgent.includes('yarn')) return 'yarn';
+    if (userAgent.includes('bun')) return 'bun';
+    if (userAgent.includes('npm')) return 'npm';
+  }
+
+  return null;
+}
+
+function detectPackageManagerFromLockfile() {
+  const lockFiles = {
+    'package-lock.json': 'npm',
+    'pnpm-lock.yaml': 'pnpm',
+    'yarn.lock': 'yarn',
+    'bun.lockb': 'bun'
+  };
+
+  for (const [file, manager] of Object.entries(lockFiles)) {
+    if (existsSync(join(process.cwd(), file))) {
+      return manager;
+    }
+  }
+
+  return null;
+}
+
+async function detectPackageManager() {
+  // First try to detect from the process/environment
+  const managerFromProcess = detectPackageManagerFromProcess();
+  if (managerFromProcess) {
+    return managerFromProcess;
+  }
+
+  // Fall back to lockfile detection
+  const managerFromLockfile = detectPackageManagerFromLockfile();
+  if (managerFromLockfile) {
+    return managerFromLockfile;
+  }
+
+  // Default to npm if nothing else is detected
+  return 'npm';
+}
+
+async function installPackages(packages, packageManager) {
+  const commands = {
+    npm: `npm install ${packages.join(' ')}`,
+    pnpm: `pnpm add ${packages.join(' ')}`,
+    yarn: `yarn add ${packages.join(' ')}`,
+    bun: `bun add ${packages.join(' ')}`
+  };
+
+  const command = commands[packageManager];
+  console.log(`\nInstalling packages using ${packageManager}...`);
+  
   try {
-    const packageJson = require(path.join(process.cwd(), 'package.json'));
-    return {
-      dependencies: packageJson.dependencies || {},
-      devDependencies: packageJson.devDependencies || {}
-    };
-  } catch (e) {
-    return { dependencies: {}, devDependencies: {} };
-  }
-}
-
-function compareVersions(current, latest) {
-  current = current?.replace(/[\^~]/g, '');
-  if (!current || !latest) return null;
-  
-  const [currentMajor, currentMinor, currentPatch] = current.split('.').map(Number);
-  const [latestMajor, latestMinor, latestPatch] = latest.split('.').map(Number);
-  
-  if (currentMajor === latestMajor && currentMinor === latestMinor && currentPatch === latestPatch) {
-    return 'same';
-  }
-  if (currentMajor > latestMajor || 
-      (currentMajor === latestMajor && currentMinor > latestMinor) ||
-      (currentMajor === latestMajor && currentMinor === latestMinor && currentPatch > latestPatch)) {
-    return 'downgrade';
-  }
-  return 'upgrade';
-}
-
-function getInstallCommand(packageManager, regularDeps, devDeps) {
-  const regularPackages = regularDeps.length ? regularDeps.join(' ') : '';
-  const devPackages = devDeps.length ? devDeps.join(' ') : '';
-  
-  switch (packageManager) {
-    case 'pnpm':
-      return [
-        regularPackages && `pnpm add ${regularPackages}`,
-        devPackages && `pnpm add -D ${devPackages}`
-      ].filter(Boolean).join(' && ');
-    case 'yarn':
-      return [
-        regularPackages && `yarn add ${regularPackages}`,
-        devPackages && `yarn add -D ${devPackages}`
-      ].filter(Boolean).join(' && ');
-    default:
-      return [
-        regularPackages && `npm install ${regularPackages}`,
-        devPackages && `npm install -D ${devPackages}`
-      ].filter(Boolean).join(' && ');
+    const { stdout, stderr } = await exec(command);
+    if (stdout) console.log(stdout);
+    if (stderr) console.error(stderr);
+    return true;
+  } catch (error) {
+    console.error(`Error installing packages: ${error.message}`);
+    return false;
   }
 }
 
 async function main() {
-  try {
-    const packageJsonPath = path.join(process.cwd(), 'package.json');
-    if (!fs.existsSync(packageJsonPath)) {
-      console.error('❌ No package.json found. Please run this command in a Node.js project.');
-      process.exit(1);
-    }
+  console.log('🚀 Welcome to Ikkan initialization!\n');
 
-    const packageManager = detectPackageManager();
-    console.log(`📦 Ikkan Dependencies Installer (using ${packageManager})\n`);
-    
-    const current = getCurrentVersions();
-    const targetVersions = await getDependencyVersions(packageManager);
-    
-    let depsToInstall = [];
-    let devDepsToInstall = [];
-    
-    // Check regular dependencies
-    for (const dep of dependencies) {
-      const currentVersion = current.dependencies[dep];
-      const targetVersion = targetVersions[dep];
-      
-      if (!currentVersion) {
-        console.log(`📥 ${dep}: Will be installed (version: ${targetVersion})`);
-        depsToInstall.push(`${dep}@${targetVersion}`);
-        continue;
-      }
-      
-      const comparison = compareVersions(currentVersion, targetVersion);
-      
-      if (comparison === 'same') {
-        console.log(`✅ ${dep}: Already at correct version (${currentVersion})`);
-        continue;
-      }
-      
-      const action = comparison === 'upgrade' ? 'upgraded' : 'downgraded';
-      const message = `❗ ${dep}: Will be ${action} from ${currentVersion} to ${targetVersion}. Proceed? (y/N) `;
-      
-      const answer = await question(message);
-      if (answer.toLowerCase() === 'y') {
-        depsToInstall.push(`${dep}@${targetVersion}`);
-      }
-    }
+  const packageManager = await detectPackageManager();
+  console.log(`📦 Detected package manager: ${packageManager}\n`);
 
-    // Check dev dependencies
-    for (const dep of devDependencies) {
-      const currentVersion = current.devDependencies[dep];
-      const targetVersion = targetVersions[dep];
-      
-      if (!currentVersion) {
-        console.log(`📥 ${dep}: Will be installed as dev dependency (version: ${targetVersion})`);
-        devDepsToInstall.push(`${dep}@${targetVersion}`);
-        continue;
-      }
-      
-      const comparison = compareVersions(currentVersion, targetVersion);
-      
-      if (comparison === 'same') {
-        console.log(`✅ ${dep}: Already at correct version (${currentVersion})`);
-        continue;
-      }
-      
-      const action = comparison === 'upgrade' ? 'upgraded' : 'downgraded';
-      const message = `❗ ${dep}: Will be ${action} from ${currentVersion} to ${targetVersion}. Proceed? (y/N) `;
-      
-      const answer = await question(message);
-      if (answer.toLowerCase() === 'y') {
-        devDepsToInstall.push(`${dep}@${targetVersion}`);
-      }
-    }
-
-    if (depsToInstall.length === 0 && devDepsToInstall.length === 0) {
-      console.log('\n✨ Nothing to install or update!');
-      rl.close();
-      return;
-    }
-
-    const summary = [
-      depsToInstall.length && `${depsToInstall.length} regular dependencies`,
-      devDepsToInstall.length && `${devDepsToInstall.length} dev dependencies`
-    ].filter(Boolean).join(' and ');
-
-    const finalConfirm = await question(`\nReady to install/update ${summary}. Continue? (y/N) `);
-    
-    if (finalConfirm.toLowerCase() !== 'y') {
-      console.log('Installation cancelled.');
-      rl.close();
-      return;
-    }
-
-    console.log('\n🚀 Installing dependencies...\n');
-
-    try {
-      const command = getInstallCommand(packageManager, depsToInstall, devDepsToInstall);
-      execSync(command, { stdio: 'inherit' });
-      console.log('\n✅ Dependencies installed successfully!');
-    } catch (error) {
-      console.error('\n❌ Error installing dependencies:', error.message);
-      process.exit(1);
-    }
-
-    rl.close();
-  } catch (error) {
-    console.error('❌ An unexpected error occurred:', error.message);
-    process.exit(1);
+  // Get peer dependencies first
+  console.log('Checking peer dependencies...');
+  const peerDeps = await getPeerDependencies(packages);
+  
+  console.log('\nThe following packages will be installed:');
+  for (const pkg of packages) {
+    console.log(`- ${pkg}`);
   }
+  
+  if (peerDeps.length > 0) {
+    console.log('\nRequired peer dependencies:');
+    for (const dep of peerDeps) {
+      console.log(`- ${dep}`);
+    }
+  }
+
+  const answer = await question('\nWould you like to continue? (Y/n): ');
+  if (answer.toLowerCase() === 'n') {
+    console.log('\n❌ Installation cancelled.');
+    rl.close();
+    return;
+  }
+
+  // Install both main packages and peer dependencies
+  const allPackages = [...packages, ...peerDeps];
+  const success = await installPackages(allPackages, packageManager);
+
+  if (success) {
+    console.log('\n✅ Installation complete! Your Ikkan is ready to use.');
+    console.log('\nQuick start guide:');
+    console.log('1. Import the packages in your code');
+    console.log('2. Check the documentation at https://eyusd.com/ikkan for next steps');
+  }
+
+  rl.close();
 }
 
-main();
+main().catch(error => {
+  console.error('Error:', error);
+  process.exit(1);
+});

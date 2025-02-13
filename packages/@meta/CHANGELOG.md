@@ -1,5 +1,11 @@
 # ikkan
 
+## 3.1.1
+
+### Patch Changes
+
+- Update package.json
+
 ## 3.1.0
 
 ### Minor Changes

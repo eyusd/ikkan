@@ -1,6 +1,6 @@
 {
   "name": "ikkan",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "description": "Meta-package for the Ikkan framework",
   "keywords": [
     "ikkan"
@@ -8,6 +8,6 @@
   "author": "eyusd",
   "license": "MIT",
   "bin": {
-    "ikkan": "./bin.js"
+    "ikkan": "bin.js"
   }
 }

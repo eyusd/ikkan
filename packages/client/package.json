@@ -1,6 +1,6 @@
 {
   "name": "@ikkan/client",
-  "version": "3.1.1",
+  "version": "3.1.2",
   "description": "",
   "keywords": [],
   "author": "eyusd",
@@ -17,13 +17,17 @@
     "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
     "clean": "rm -rf dist && rm -rf node_modules"
   },
-  "dependencies": {
-    "@ikkan/core": "workspace:*",
-    "react": "^19.0.0",
-    "swr": "^2.3.0",
-    "zod": "^3.24.1"
-  },
   "devDependencies": {
-    "@types/react": "^19"
+    "@ikkan/core": "workspace:*",
+    "@types/react": "^16.11.0 || ^17.0.0 || ^18.0.0 || ^19.0.0",
+    "react": "^16.11.0 || ^17.0.0 || ^18.0.0 || ^19.0.0",
+    "swr": "^2.3.0",
+    "zod": "^3.0.0"
+  },
+  "peerDependencies": {
+    "@ikkan/core": "workspace:*",
+    "react": "^16.11.0 || ^17.0.0 || ^18.0.0 || ^19.0.0",
+    "swr": "^2.3.0",
+    "zod": "^3.0.0"
   }
 }

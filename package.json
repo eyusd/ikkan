@@ -5,7 +5,7 @@
   "keywords": [],
   "author": "eyusd",
   "license": "MIT",
-  "packageManager": "pnpm@10.2.1",
+  "packageManager": "pnpm@10.3.0",
   "scripts": {
     "build": "turbo run build --filter=!example",
     "dev": "turbo run dev --filter=!example",

@@ -1,5 +1,13 @@
 # @ikkan/client
 
+## 3.1.2
+
+### Patch Changes
+
+- Update package.json
+- Updated dependencies
+  - @ikkan/core@3.1.2
+
 ## 3.1.1
 
 ### Patch Changes

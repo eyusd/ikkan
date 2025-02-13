@@ -1,6 +1,6 @@
 {
   "name": "@ikkan/server",
-  "version": "3.1.1",
+  "version": "3.1.2",
   "description": "",
   "keywords": [],
   "author": "eyusd",
@@ -17,9 +17,14 @@
     "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
     "clean": "rm -rf dist && rm -rf node_modules"
   },
-  "dependencies": {
+  "devDependencies": {
     "@ikkan/core": "workspace:*",
-    "next": "^15.1.6",
-    "zod": "^3.24.1"
+    "next": "^15.0.0",
+    "zod": "^3.0.0"
+  },
+  "peerDependencies": {
+    "@ikkan/core": "workspace:*",
+    "next": "^15.0.0",
+    "zod": "^3.0.0"
   }
 }
