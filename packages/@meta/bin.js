@@ -36,7 +36,7 @@ async function getPeerDependencies(packages) {
     }
   }
   
-  return Array.from(allPeerDeps);
+  return Array.from(allPeerDeps).filter(dep => !packages.includes(dep));
 }
 
 function detectPackageManagerFromProcess() {

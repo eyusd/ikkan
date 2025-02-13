@@ -1,5 +1,11 @@
 # ikkan
 
+## 3.1.2
+
+### Patch Changes
+
+- Removed duplicate peer dep
+
 ## 3.1.1
 
 ### Patch Changes
