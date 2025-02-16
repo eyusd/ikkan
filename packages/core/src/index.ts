@@ -12,12 +12,12 @@ export function ikkanConfig<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
   Schema extends z.ZodType | undefined = undefined,
-  EndpointArgs extends
+  Segments extends
     | Record<string, string | string[]>
     | undefined = undefined,
-  ServerSideImports extends (() => Promise<any>) | undefined = undefined,
+  SSI extends (() => Promise<any>) | undefined = undefined,
 >(
-  config: IkkanConfig<Method, Output, Schema, EndpointArgs, ServerSideImports>,
-): IkkanConfig<Method, Output, Schema, EndpointArgs, ServerSideImports> {
+  config: IkkanConfig<Method, Output, Schema, Segments, SSI>,
+): IkkanConfig<Method, Output, Schema, Segments, SSI> {
   return config;
 }

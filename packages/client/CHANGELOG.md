@@ -1,5 +1,16 @@
 # @ikkan/client
 
+## 4.0.0
+
+### Minor Changes
+
+- Renamed types for more explicit naming
+
+### Patch Changes
+
+- Updated dependencies
+  - @ikkan/core@3.2.0
+
 ## 3.1.2
 
 ### Patch Changes

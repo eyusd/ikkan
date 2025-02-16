@@ -1,3 +1,5 @@
+"use client";
+
 import {
   EndpointGenerator,
   IkkanFetcher,
@@ -43,15 +45,15 @@ export function makeTransformNoEndpoint<
 export function makeTransformWithEndpoint<
   Output extends JsonValue,
   Schema extends z.ZodType | undefined,
-  EndpointArgs extends Record<string, string | string[]>,
->(endpoint: EndpointGenerator<EndpointArgs>) {
+  Segments extends Record<string, string | string[]>,
+>(endpoint: EndpointGenerator<Segments>) {
   return (
     partializedFetcher: IkkanFetcher<Output, Schema, undefined>,
-    args: EndpointArgs,
+    segments: Segments,
   ) => {
-    const url = endpoint(args);
-    return function hook(...params: IkkanFetcherParams<Schema, undefined>) {
-      return stateWrapper<Output>(url, () => partializedFetcher(...params));
+    const url = endpoint(segments);
+    return function hook(...args: IkkanFetcherParams<Schema, undefined>) {
+      return stateWrapper<Output>(url, () => partializedFetcher(...args));
     };
   };
 }

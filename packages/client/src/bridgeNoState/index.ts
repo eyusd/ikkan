@@ -25,13 +25,13 @@ export function ikkanBridgeNoState<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
   Schema extends z.ZodType | undefined,
-  EndpointArgs extends Record<string, string | string[]> | undefined,
-  ServerSideImports extends (() => Promise<any>) | undefined,
+  Segments extends Record<string, string | string[]> | undefined,
+  SSI extends (() => Promise<any>) | undefined,
   T extends JsonValue[],
 >(
-  config: IkkanConfig<Method, Output, Schema, EndpointArgs, ServerSideImports>,
-  sideEffects: IkkanSideEffects<T, Output, Schema, EndpointArgs>,
-): IkkanClientBridgeNoStateHook<Method, Output, Schema, EndpointArgs> {
+  config: IkkanConfig<Method, Output, Schema, Segments, SSI>,
+  sideEffects: IkkanSideEffects<T, Output, Schema, Segments>,
+): IkkanClientBridgeNoStateHook<Method, Output, Schema, Segments> {
   const handler = schemaEndpointBranch(config, [sideEffects], {
     noSchemaNoEndpoint: bridgeNoSchemaNoEndpoint,
     noSchemaWithEndpoint: bridgeNoSchemaWithEndpoint,
@@ -45,6 +45,6 @@ export function ikkanBridgeNoState<
     Method,
     Output,
     Schema,
-    EndpointArgs
+    Segments
   >;
 }

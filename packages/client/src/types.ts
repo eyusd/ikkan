@@ -9,19 +9,19 @@ import { IkkanClientBridgeNoStateHook } from "./bridgeNoState";
  * @template Method - The HTTP method type (e.g., GET, POST) that extends `NextHTTPMethod`.
  * @template Output - The type of the output data that extends `JsonValue`.
  * @template Schema - The validation schema type that extends `z.ZodType` or can be `undefined`.
- * @template EndpointArgs - The type of the endpoint arguments that extends a record of strings or string arrays, or can be `undefined`.
+ * @template Segments - The type of the endpoint arguments that extends a record of strings or string arrays, or can be `undefined`.
  *
- * @property {IkkanClientBridgeWithStateHook<Output, Schema, EndpointArgs>} hook - The hook for handling stateful operations.
- * @property {IkkanClientBridgeNoStateHook<Method, Output, Schema, EndpointArgs>} action - The action for handling stateless operations.
+ * @property {IkkanClientBridgeWithStateHook<Output, Schema, Segments>} hook - The hook for handling stateful operations.
+ * @property {IkkanClientBridgeNoStateHook<Method, Output, Schema, Segments>} action - The action for handling stateless operations.
  */
 export type IkkanClientBridgeHandler<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
   Schema extends z.ZodType | undefined,
-  EndpointArgs extends Record<string, string | string[]> | undefined,
+  Segments extends Record<string, string | string[]> | undefined,
 > = {
-  hook: IkkanClientBridgeWithStateHook<Output, Schema, EndpointArgs>;
-  action: IkkanClientBridgeNoStateHook<Method, Output, Schema, EndpointArgs>;
+  hook: IkkanClientBridgeWithStateHook<Output, Schema, Segments>;
+  action: IkkanClientBridgeNoStateHook<Method, Output, Schema, Segments>;
 };
 
 /**
@@ -39,13 +39,13 @@ export type IkkanSchema<T> = T extends
   | IkkanClientBridgeWithStateHook<
       infer _Output,
       infer Schema,
-      infer _EndpointArgs
+      infer _Segments
     >
   | IkkanClientBridgeNoStateHook<
       infer _Method,
       infer _Output,
       infer Schema,
-      infer _EndpointArgs
+      infer _Segments
     >
   ? Schema extends z.ZodType
     ? Schema

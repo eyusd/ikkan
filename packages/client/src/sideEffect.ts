@@ -5,27 +5,27 @@ import { z } from "zod";
 export type FullArgs<
   FromOutput extends JsonValue,
   FromSchema extends z.ZodType | undefined,
-  FromEndpointArgs extends Record<string, string | string[]> | undefined,
+  FromSegments extends Record<string, string | string[]> | undefined,
 > = {
-  args: FromEndpointArgs;
+  segments: FromSegments;
   params: FromSchema extends z.ZodType ? z.infer<FromSchema> : undefined;
   output: FromOutput;
 };
 
-type EndpointArgsGenerator<
-  ToEndpointArgs extends Record<string, string | string[]> | undefined,
+type SegmentsGenerator<
+  ToSegments extends Record<string, string | string[]> | undefined,
   FromOutput extends JsonValue,
   FromSchema extends z.ZodType | undefined,
-  FromEndpointArgs extends Record<string, string | string[]> | undefined,
+  FromSegments extends Record<string, string | string[]> | undefined,
 > = (
-  args: FullArgs<FromOutput, FromSchema, FromEndpointArgs>,
-) => ToEndpointArgs;
+  args: FullArgs<FromOutput, FromSchema, FromSegments>,
+) => ToSegments;
 
 type URLGenerator<
   FromOutput extends JsonValue,
   FromSchema extends z.ZodType | undefined,
-  FromEndpointArgs extends Record<string, string | string[]> | undefined,
-> = (args: FullArgs<FromOutput, FromSchema, FromEndpointArgs>) => string;
+  FromSegments extends Record<string, string | string[]> | undefined,
+> = (args: FullArgs<FromOutput, FromSchema, FromSegments>) => string;
 
 type Mutator<ToOutput extends JsonValue, FromOutput extends JsonValue> = (
   cachedValue: ToOutput | undefined,
@@ -36,23 +36,23 @@ type IkkanSideEffect<
   ToOutput extends JsonValue,
   FromOutput extends JsonValue,
   FromSchema extends z.ZodType | undefined,
-  FromEndpointArgs extends Record<string, string | string[]> | undefined,
+  FromSegments extends Record<string, string | string[]> | undefined,
 > = {
   mutator: Mutator<ToOutput, FromOutput>;
-  urlGenerator: URLGenerator<FromOutput, FromSchema, FromEndpointArgs>;
+  urlGenerator: URLGenerator<FromOutput, FromSchema, FromSegments>;
 };
 
 export type IkkanSideEffects<
   FromT extends JsonValue[],
   FromOutput extends JsonValue,
   FromSchema extends z.ZodType | undefined,
-  FromEndpointArgs extends Record<string, string | string[]> | undefined,
+  FromSegments extends Record<string, string | string[]> | undefined,
 > = {
   [K in keyof FromT]: IkkanSideEffect<
     FromT[K],
     FromOutput,
     FromSchema,
-    FromEndpointArgs
+    FromSegments
   >;
 };
 
@@ -60,7 +60,7 @@ function partialSideEffectNoEndpoint<
   ToOutput extends JsonValue,
   FromOutput extends JsonValue,
   FromSchema extends z.ZodType | undefined,
-  FromEndpointArgs extends Record<string, string | string[]> | undefined,
+  FromSegments extends Record<string, string | string[]> | undefined,
 >({
   mutator,
   endpoint,
@@ -71,83 +71,83 @@ function partialSideEffectNoEndpoint<
   return {
     urlGenerator: () => endpoint(),
     mutator,
-  } as IkkanSideEffect<ToOutput, FromOutput, FromSchema, FromEndpointArgs>;
+  } as IkkanSideEffect<ToOutput, FromOutput, FromSchema, FromSegments>;
 }
 
 function partialSideEffectWithEndpoint<
   ToOutput extends JsonValue,
-  ToEndpointArgs extends Record<string, string | string[]>,
+  ToSegments extends Record<string, string | string[]>,
   FromOutput extends JsonValue,
   FromSchema extends z.ZodType | undefined,
-  FromEndpointArgs extends Record<string, string | string[]> | undefined,
+  FromSegments extends Record<string, string | string[]> | undefined,
 >({
   mutator,
   endpoint,
   endpointGenerator,
 }: {
   mutator: Mutator<ToOutput, FromOutput>;
-  endpoint: EndpointGenerator<ToEndpointArgs>;
-  endpointGenerator: EndpointArgsGenerator<
-    ToEndpointArgs,
+  endpoint: EndpointGenerator<ToSegments>;
+  endpointGenerator: SegmentsGenerator<
+    ToSegments,
     FromOutput,
     FromSchema,
-    FromEndpointArgs
+    FromSegments
   >;
 }) {
   return {
-    urlGenerator: (args: FullArgs<FromOutput, FromSchema, FromEndpointArgs>) =>
+    urlGenerator: (args: FullArgs<FromOutput, FromSchema, FromSegments>) =>
       endpoint(endpointGenerator(args)),
     mutator,
-  } as IkkanSideEffect<ToOutput, FromOutput, FromSchema, FromEndpointArgs>;
+  } as IkkanSideEffect<ToOutput, FromOutput, FromSchema, FromSegments>;
 }
 
 type VariableSideEffect<
   ToOutput extends JsonValue,
-  ToEndpointArgs extends Record<string, string | string[]> | undefined,
+  ToSegments extends Record<string, string | string[]> | undefined,
   FromOutput extends JsonValue,
   FromSchema extends z.ZodType | undefined,
-  FromEndpointArgs extends Record<string, string | string[]> | undefined,
+  FromSegments extends Record<string, string | string[]> | undefined,
 > = (
-  args: ToEndpointArgs extends Record<string, string | string[]>
+  args: ToSegments extends Record<string, string | string[]>
     ? {
-        endpointGenerator: EndpointArgsGenerator<
-          ToEndpointArgs,
+        endpointGenerator: SegmentsGenerator<
+          ToSegments,
           FromOutput,
           FromSchema,
-          FromEndpointArgs
+          FromSegments
         >;
         mutator: Mutator<ToOutput, FromOutput>;
       }
     : {
         mutator: Mutator<ToOutput, FromOutput>;
       },
-) => IkkanSideEffect<ToOutput, FromOutput, FromSchema, FromEndpointArgs>;
+) => IkkanSideEffect<ToOutput, FromOutput, FromSchema, FromSegments>;
 
 export function sideEffect<
   ToMethod extends NextHTTPMethod,
   ToOutput extends JsonValue,
   ToSchema extends z.ZodType | undefined,
-  ToEndpointArgs extends Record<string, string | string[]> | undefined,
-  ToServerSideImports extends (() => Promise<any>) | undefined,
+  ToSegments extends Record<string, string | string[]> | undefined,
+  ToSSI extends (() => Promise<any>) | undefined,
   FromMethod extends NextHTTPMethod,
   FromOutput extends JsonValue,
   FromSchema extends z.ZodType | undefined,
-  FromEndpointArgs extends Record<string, string | string[]> | undefined,
-  FromServerSideImports extends (() => Promise<any>) | undefined,
+  FromSegments extends Record<string, string | string[]> | undefined,
+  FromSSI extends (() => Promise<any>) | undefined,
 >(
   fromConfig: IkkanConfig<
     FromMethod,
     FromOutput,
     FromSchema,
-    FromEndpointArgs,
-    FromServerSideImports
+    FromSegments,
+    FromSSI
   >,
   toConfig: IkkanConfig<
     ToMethod,
     ToOutput,
     ToSchema,
-    ToEndpointArgs,
-    ToServerSideImports
+    ToSegments,
+    ToSSI
   >,
 ) {
   const { endpoint: otherEndpoint } = toConfig;
@@ -158,40 +158,40 @@ export function sideEffect<
         undefined,
         FromOutput,
         FromSchema,
-        FromEndpointArgs
+        FromSegments
       > = ({ mutator }) =>
         partialSideEffectNoEndpoint<
           ToOutput,
           FromOutput,
           FromSchema,
-          FromEndpointArgs
+          FromSegments
         >({ mutator, endpoint: otherEndpoint as EndpointGenerator<undefined> });
       return variableEffectNoEndpoint;
     }
     case 1: {
       const variableEffectWithEndpoint: VariableSideEffect<
         ToOutput,
-        Exclude<ToEndpointArgs, undefined>,
+        Exclude<ToSegments, undefined>,
         FromOutput,
         FromSchema,
-        FromEndpointArgs
+        FromSegments
       > = ({ endpointGenerator, mutator }) =>
         partialSideEffectWithEndpoint<
           ToOutput,
-          Exclude<ToEndpointArgs, undefined>,
+          Exclude<ToSegments, undefined>,
           FromOutput,
           FromSchema,
-          FromEndpointArgs
+          FromSegments
         >({
           mutator,
           endpoint: otherEndpoint as EndpointGenerator<
-            Exclude<ToEndpointArgs, undefined>
+            Exclude<ToSegments, undefined>
           >,
-          endpointGenerator: endpointGenerator as EndpointArgsGenerator<
-            Exclude<ToEndpointArgs, undefined>,
+          endpointGenerator: endpointGenerator as SegmentsGenerator<
+            Exclude<ToSegments, undefined>,
             FromOutput,
             FromSchema,
-            FromEndpointArgs
+            FromSegments
           >,
         });
       return variableEffectWithEndpoint;

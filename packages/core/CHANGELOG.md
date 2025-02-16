@@ -1,5 +1,11 @@
 # @ikkan/core
 
+## 3.2.0
+
+### Minor Changes
+
+- Renamed types for more explicit naming
+
 ## 3.1.2
 
 ### Patch Changes

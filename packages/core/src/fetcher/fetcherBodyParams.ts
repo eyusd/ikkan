@@ -53,17 +53,17 @@ export function makeFetcherBodyParamsWithEndpoint<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
   Schema extends z.ZodType,
-  EndpointArgs extends Record<string, string | string[]>,
+  Segments extends Record<string, string | string[]>,
 >(
-  endpointGenerator: EndpointGenerator<EndpointArgs>,
+  endpointGenerator: EndpointGenerator<Segments>,
   method: Method,
-): IkkanFetcher<Output, Schema, EndpointArgs> {
+): IkkanFetcher<Output, Schema, Segments> {
   return async function fetcherBody(
-    ...args: IkkanFetcherParams<Schema, EndpointArgs>
+    ...args: IkkanFetcherParams<Schema, Segments>
   ): Promise<Output> {
-    const [endpointGeneratorArgs, params, options] = args;
-    const url = endpointGenerator(endpointGeneratorArgs);
+    const [segments, params, options] = args;
+    const url = endpointGenerator(segments);
 
     return await fetcher(method, url, params, options);
-  } as IkkanFetcher<Output, Schema, EndpointArgs>;
+  } as IkkanFetcher<Output, Schema, Segments>;
 }

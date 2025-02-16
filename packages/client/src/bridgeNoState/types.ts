@@ -5,10 +5,10 @@ export type IkkanClientBridgeNoStateHook<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
   Schema extends z.ZodType | undefined,
-  EndpointArgs extends Record<string, string | string[]> | undefined,
+  Segments extends Record<string, string | string[]> | undefined,
 > = (
-  ...args: EndpointArgs extends Record<string, string | string[]>
-    ? [args: EndpointArgs]
+  ...args: Segments extends Record<string, string | string[]>
+    ? [args: Segments]
     : []
 ) => {
   [key in Lowercase<Method>]: IkkanFetcher<Output, Schema, undefined>;

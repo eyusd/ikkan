@@ -14,10 +14,10 @@ export function bridgeSearchParamsNoEndpoint<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
   Schema extends z.ZodType,
-  ServerSideImports extends (() => Promise<any>) | undefined,
+  SSI extends (() => Promise<any>) | undefined,
   T extends JsonValue[],
 >(
-  config: IkkanConfig<Method, Output, Schema, undefined, ServerSideImports>,
+  config: IkkanConfig<Method, Output, Schema, undefined, SSI>,
   sideEffects: IkkanSideEffects<T, Output, Schema, undefined>,
 ) {
   const { endpoint, method } = config;
@@ -33,21 +33,21 @@ export function bridgeSearchParamsWithEndpoint<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
   Schema extends z.ZodType,
-  EndpointArgs extends Record<string, string | string[]>,
-  ServerSideImports extends (() => Promise<any>) | undefined,
+  Segments extends Record<string, string | string[]>,
+  SSI extends (() => Promise<any>) | undefined,
   T extends JsonValue[],
 >(
-  config: IkkanConfig<Method, Output, Schema, EndpointArgs, ServerSideImports>,
-  sideEffects: IkkanSideEffects<T, Output, Schema, EndpointArgs>,
+  config: IkkanConfig<Method, Output, Schema, Segments, SSI>,
+  sideEffects: IkkanSideEffects<T, Output, Schema, Segments>,
 ) {
   const { endpoint, method } = config;
   const fetcher = makeFetcherSearchParamsWithEndpoint<
     Method,
     Output,
     Schema,
-    EndpointArgs
+    Segments
   >(endpoint, method);
-  const transform = makeTransformWithEndpoint<Output, Schema, EndpointArgs>(
+  const transform = makeTransformWithEndpoint<Output, Schema, Segments>(
     endpoint,
   );
   return clientHookWithEndpoint(fetcher, sideEffects, transform);

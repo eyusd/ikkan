@@ -13,11 +13,11 @@ import { FullArgs, IkkanSideEffects } from "./sideEffect";
 async function applySideEffects<
   Output extends JsonValue,
   Schema extends z.ZodType | undefined,
-  EndpointArgs extends Record<string, string | string[]> | undefined,
+  Segments extends Record<string, string | string[]> | undefined,
   T extends JsonValue[],
 >(
-  fullArgs: FullArgs<Output, Schema, EndpointArgs>,
-  sideEffects: IkkanSideEffects<T, Output, Schema, EndpointArgs>,
+  fullArgs: FullArgs<Output, Schema, Segments>,
+  sideEffects: IkkanSideEffects<T, Output, Schema, Segments>,
 ) {
   await Promise.all(
     sideEffects.map(async ({ mutator, urlGenerator }) => {
@@ -59,7 +59,7 @@ export function clientHookNoEndpoint<
         const fullArgs = {
           output: response,
           params,
-          args: undefined,
+          segments: undefined,
         } as FullArgs<Output, Schema, undefined>;
         await applySideEffects(fullArgs, sideEffects);
         return response;
@@ -75,27 +75,27 @@ export function clientHookNoEndpoint<
 export function clientHookWithEndpoint<
   Output extends JsonValue,
   Schema extends z.ZodType | undefined,
-  EndpointArgs extends Record<string, string | string[]>,
+  Segments extends Record<string, string | string[]>,
   T extends JsonValue[],
   TransformResult,
 >(
-  fetcher: IkkanFetcher<Output, Schema, EndpointArgs>,
-  sideEffects: IkkanSideEffects<T, Output, Schema, EndpointArgs>,
+  fetcher: IkkanFetcher<Output, Schema, Segments>,
+  sideEffects: IkkanSideEffects<T, Output, Schema, Segments>,
   transform: (
     partializedFetcher: IkkanFetcher<Output, Schema, undefined>,
-    args: EndpointArgs,
+    args: Segments,
   ) => TransformResult,
 ) {
-  return (args: EndpointArgs) => {
+  return (segments: Segments) => {
     const partializedFetcher: IkkanFetcher<Output, Schema, undefined> = async (
       ...params: IkkanFetcherParams<Schema, undefined>
     ): Promise<Output> => {
       try {
-        const response = await fetcher(...([args, ...params] as any));
-        const fullArgs = { output: response, params, args } as FullArgs<
+        const response = await fetcher(...([segments, ...params] as any));
+        const fullArgs = { output: response, params, segments } as FullArgs<
           Output,
           Schema,
-          EndpointArgs
+          Segments
         >;
         await applySideEffects(fullArgs, sideEffects);
         return response;
@@ -107,6 +107,6 @@ export function clientHookWithEndpoint<
       }
     };
 
-    return transform(partializedFetcher, args);
+    return transform(partializedFetcher, segments);
   };
 }

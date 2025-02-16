@@ -17,13 +17,13 @@ export function partializeFetcherNoEndpoint<
 export function partializeFetcherWithEndpoint<
   Output extends JsonValue,
   Schema extends z.ZodType | undefined,
-  EndpointArgs extends Record<string, string | string[]>,
->(fetcher: IkkanFetcher<Output, Schema, EndpointArgs>) {
-  return (args: EndpointArgs) => {
+  Segments extends Record<string, string | string[]>,
+>(fetcher: IkkanFetcher<Output, Schema, Segments>) {
+  return (segments: Segments) => {
     return async function fetcherPartialized(
-      ...params: IkkanFetcherParams<Schema, undefined>
+      ...args: IkkanFetcherParams<Schema, undefined>
     ): Promise<Output> {
-      return await fetcher(...([args, ...params] as any));
+      return await fetcher(...([segments, ...args] as any));
     } as IkkanFetcher<Output, Schema, undefined>;
   };
 }

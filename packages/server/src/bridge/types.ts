@@ -7,19 +7,19 @@ import { z } from "zod";
  *
  * @template Output - The type of the output value, which extends `JsonValue`.
  * @template Schema - The schema type, which extends `z.ZodType` or can be `undefined`.
- * @template EndpointArgs - The type of the endpoint arguments, which extends a record of strings or string arrays, or can be `undefined`.
+ * @template Segments - The type of the endpoint arguments, which extends a record of strings or string arrays, or can be `undefined`.
  *
- * @param args - The endpoint arguments. If `EndpointArgs` is a record of strings or string arrays, this parameter is required.
+ * @param args - The endpoint arguments. If `Segments` is a record of strings or string arrays, this parameter is required.
  *
  * @returns An instance of `IkkanFetcher` with the specified `Output`, `Schema`, and `undefined`.
  */
 export type IkkanServerBridgeHandler<
   Output extends JsonValue,
   Schema extends z.ZodType | undefined,
-  EndpointArgs extends Record<string, string | string[]> | undefined,
+  Segments extends Record<string, string | string[]> | undefined,
 > = (
-  ...args: EndpointArgs extends Record<string, string | string[]>
-    ? [args: EndpointArgs]
+  ...args: Segments extends Record<string, string | string[]>
+    ? [segments: Segments]
     : []
 ) => IkkanFetcher<Output, Schema, undefined>;
 
@@ -38,7 +38,7 @@ export type IkkanSchema<T> =
   T extends IkkanServerBridgeHandler<
     infer _Output,
     infer Schema,
-    infer _EndpointArgs
+    infer _Segments
   >
     ? Schema extends z.ZodType
       ? Schema

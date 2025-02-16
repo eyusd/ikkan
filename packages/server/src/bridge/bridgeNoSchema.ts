@@ -14,9 +14,9 @@ import { IkkanServerBridgeHandler } from "./types";
 export function ikkanServerBridgeNoSchemaNoEndpoint<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
-  ServerSideImports extends (() => Promise<any>) | undefined,
+  SSI extends (() => Promise<any>) | undefined,
 >(
-  config: IkkanConfig<Method, Output, undefined, undefined, ServerSideImports>,
+  config: IkkanConfig<Method, Output, undefined, undefined, SSI>,
 ) {
   const { endpoint, method } = config;
 
@@ -35,20 +35,20 @@ export function ikkanServerBridgeNoSchemaNoEndpoint<
 export function ikkanServerBridgeNoSchemaWithEndpoint<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
-  EndpointArgs extends Record<string, string | string[]>,
-  ServerSideImports extends (() => Promise<any>) | undefined,
+  Segments extends Record<string, string | string[]>,
+  SSI extends (() => Promise<any>) | undefined,
 >(
   config: IkkanConfig<
     Method,
     Output,
     undefined,
-    EndpointArgs,
-    ServerSideImports
+    Segments,
+    SSI
   >,
 ) {
   const { endpoint, method } = config;
 
-  const fetcher = makeFetcherNoSchemaWithEndpoint<Method, Output, EndpointArgs>(
+  const fetcher = makeFetcherNoSchemaWithEndpoint<Method, Output, Segments>(
     endpoint,
     method,
   );
@@ -56,6 +56,6 @@ export function ikkanServerBridgeNoSchemaWithEndpoint<
   return partializeFetcherWithEndpoint(fetcher) as IkkanServerBridgeHandler<
     Output,
     undefined,
-    EndpointArgs
+    Segments
   >;
 }

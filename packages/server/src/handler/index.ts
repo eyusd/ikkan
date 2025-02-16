@@ -33,10 +33,10 @@ type IkkanHandlerExport<
  * @template Method - The HTTP method type.
  * @template Output - The type of the output JSON value.
  * @template Schema - The Zod schema type or undefined.
- * @template EndpointArgs - The type of endpoint arguments or undefined.
- * @template ServerSideImports - The type of server-side imports or undefined.
+ * @template Segments - The type of endpoint arguments or undefined.
+ * @template SSI - The type of server-side imports or undefined.
  *
- * @param {IkkanConfig<Method, Output, Schema, EndpointArgs, ServerSideImports>} config - The configuration object for the Ikkan handler.
+ * @param {IkkanConfig<Method, Output, Schema, Segments, SSI>} config - The configuration object for the Ikkan handler.
  * @returns {Promise<IkkanHandlerExport<Method, Output>>} - A promise that resolves to the Ikkan handler export.
  *
  * @throws {Error} If the method is invalid.
@@ -45,10 +45,10 @@ export async function ikkanHandler<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
   Schema extends z.ZodType | undefined,
-  EndpointArgs extends Record<string, string | string[]> | undefined,
-  ServerSideImports extends (() => Promise<any>) | undefined,
+  Segments extends Record<string, string | string[]> | undefined,
+  SSI extends (() => Promise<any>) | undefined,
 >(
-  config: IkkanConfig<Method, Output, Schema, EndpointArgs, ServerSideImports>,
+  config: IkkanConfig<Method, Output, Schema, Segments, SSI>,
 ): Promise<IkkanHandlerExport<Method, Output>> {
   const { method } = config;
   if ("ssi" in config) {

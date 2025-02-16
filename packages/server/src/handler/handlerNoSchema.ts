@@ -10,15 +10,15 @@ import {
 export async function ikkanHandlerNoSchemaNoSSI<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
-  EndpointArgs extends Record<string, string | string[]> | undefined,
-  ServerSideImports extends undefined,
+  Segments extends Record<string, string | string[]> | undefined,
+  SSI extends undefined,
 >(
   config: IkkanConfig<
     Method,
     Output,
     undefined,
-    EndpointArgs,
-    ServerSideImports
+    Segments,
+    SSI
   >,
 ): Promise<NextHandler<Output>> {
   const { fn } = config;
@@ -35,15 +35,15 @@ export async function ikkanHandlerNoSchemaNoSSI<
 export async function ikkanHandlerNoSchemaWithSSI<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
-  EndpointArgs extends Record<string, string | string[]> | undefined,
-  ServerSideImports extends () => Promise<any>,
+  Segments extends Record<string, string | string[]> | undefined,
+  SSI extends () => Promise<any>,
 >(
   config: IkkanConfig<
     Method,
     Output,
     undefined,
-    EndpointArgs,
-    ServerSideImports
+    Segments,
+    SSI
   >,
 ): Promise<NextHandler<Output>> {
   const { fn, ssi } = config;

@@ -1,5 +1,18 @@
 # example
 
+## 1.1.0
+
+### Minor Changes
+
+- Renamed types for more explicit naming
+
+### Patch Changes
+
+- Updated dependencies
+  - @ikkan/client@4.0.0
+  - @ikkan/server@4.0.0
+  - @ikkan/core@3.2.0
+
 ## 1.0.3
 
 ### Patch Changes

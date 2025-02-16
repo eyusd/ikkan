@@ -29,10 +29,10 @@ export async function ikkanHandlerSearchParamsNoSSI<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
   Schema extends z.ZodType,
-  EndpointArgs extends Record<string, string | string[]> | undefined,
-  ServerSideImports extends undefined,
+  Segments extends Record<string, string | string[]> | undefined,
+  SSI extends undefined,
 >(
-  config: IkkanConfig<Method, Output, Schema, EndpointArgs, ServerSideImports>,
+  config: IkkanConfig<Method, Output, Schema, Segments, SSI>,
 ): Promise<NextHandler<Output>> {
   const { schema, fn } = config;
   return async (req, { params: context }) => {
@@ -52,10 +52,10 @@ export async function ikkanHandlerSearchParamsWithSSI<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
   Schema extends z.ZodType,
-  EndpointArgs extends Record<string, string | string[]> | undefined,
-  ServerSideImports extends () => Promise<any>,
+  Segments extends Record<string, string | string[]> | undefined,
+  SSI extends () => Promise<any>,
 >(
-  config: IkkanConfig<Method, Output, Schema, EndpointArgs, ServerSideImports>,
+  config: IkkanConfig<Method, Output, Schema, Segments, SSI>,
 ): Promise<NextHandler<Output>> {
   const { schema, fn, ssi } = config;
   const imports = await ssi();

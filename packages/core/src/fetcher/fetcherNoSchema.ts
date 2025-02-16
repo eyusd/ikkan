@@ -45,17 +45,17 @@ export function makeFetcherNoSchemaNoEndpoint<
 export function makeFetcherNoSchemaWithEndpoint<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
-  EndpointArgs extends Record<string, string | string[]>,
+  Segments extends Record<string, string | string[]>,
 >(
-  endpointGenerator: EndpointGenerator<EndpointArgs>,
+  endpointGenerator: EndpointGenerator<Segments>,
   method: Method,
-): IkkanFetcher<Output, undefined, EndpointArgs> {
+): IkkanFetcher<Output, undefined, Segments> {
   return async function fetcherNoSchema(
-    ...args: IkkanFetcherParams<undefined, EndpointArgs>
+    ...args: IkkanFetcherParams<undefined, Segments>
   ): Promise<Output> {
-    const [endpointGeneratorArgs, options] = args;
-    const url = endpointGenerator(endpointGeneratorArgs);
+    const [segments, options] = args;
+    const url = endpointGenerator(segments);
 
     return await fetcher<Output>(method, url, options);
-  } as IkkanFetcher<Output, undefined, EndpointArgs>;
+  } as IkkanFetcher<Output, undefined, Segments>;
 }

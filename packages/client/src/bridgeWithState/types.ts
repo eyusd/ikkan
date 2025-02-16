@@ -4,12 +4,12 @@ import { z } from "zod";
 export type IkkanClientBridgeWithStateHook<
   Output extends JsonValue,
   Schema extends z.ZodType | undefined,
-  EndpointArgs extends Record<string, string | string[]> | undefined,
+  Segments extends Record<string, string | string[]> | undefined,
 > = (
-  ...args: EndpointArgs extends Record<string, string | string[]>
-    ? [args: EndpointArgs]
+  ...args: Segments extends Record<string, string | string[]>
+    ? [segments: Segments]
     : []
-) => (...params: IkkanFetcherParams<Schema, undefined>) => {
+) => (...args: IkkanFetcherParams<Schema, undefined>) => {
   data: Output | undefined;
   error: SerializedAPIError | undefined;
 };

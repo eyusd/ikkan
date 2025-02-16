@@ -8,7 +8,7 @@ export const { hook: usePostTaskContent, action: taskContent } =
       config,
       apiTasksConfig,
     )({
-      endpointGenerator: ({ args: { id } }) => ({ id }),
+      endpointGenerator: ({ segments: { id } }) => ({ id }),
       mutator: (cachedValue, response) => {
         return response;
       },

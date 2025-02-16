@@ -6,10 +6,10 @@ type HandlerOperator<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
   Schema extends z.ZodType | undefined,
-  EndpointArgs extends Record<string, string | string[]> | undefined,
-  ServerSideImports extends (() => Promise<any>) | undefined,
+  Segments extends Record<string, string | string[]> | undefined,
+  SSI extends (() => Promise<any>) | undefined,
 > = (
-  config: IkkanConfig<Method, Output, Schema, EndpointArgs, ServerSideImports>,
+  config: IkkanConfig<Method, Output, Schema, Segments, SSI>,
   ...supplementaryArgs: any[]
 ) => unknown;
 
@@ -17,50 +17,50 @@ type SchemaEndpointBranchParams<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
   Schema extends z.ZodType | undefined,
-  EndpointArgs extends Record<string, string | string[]> | undefined,
-  ServerSideImports extends (() => Promise<any>) | undefined,
+  Segments extends Record<string, string | string[]> | undefined,
+  SSI extends (() => Promise<any>) | undefined,
 > = {
   noSchemaNoEndpoint: HandlerOperator<
     Method,
     Output,
     undefined,
     undefined,
-    ServerSideImports
+    SSI
   >;
   noSchemaWithEndpoint: HandlerOperator<
     Method,
     Output,
     undefined,
-    Exclude<EndpointArgs, undefined>,
-    ServerSideImports
+    Exclude<Segments, undefined>,
+    SSI
   >;
   bodyParamsNoEndpoint: HandlerOperator<
     Method,
     Output,
     Exclude<Schema, undefined>,
     undefined,
-    ServerSideImports
+    SSI
   >;
   bodyParamsWithEndpoint: HandlerOperator<
     Method,
     Output,
     Exclude<Schema, undefined>,
-    Exclude<EndpointArgs, undefined>,
-    ServerSideImports
+    Exclude<Segments, undefined>,
+    SSI
   >;
   searchParamsNoEndpoint: HandlerOperator<
     Method,
     Output,
     Exclude<Schema, undefined>,
     undefined,
-    ServerSideImports
+    SSI
   >;
   searchParamsWithEndpoint: HandlerOperator<
     Method,
     Output,
     Exclude<Schema, undefined>,
-    Exclude<EndpointArgs, undefined>,
-    ServerSideImports
+    Exclude<Segments, undefined>,
+    SSI
   >;
 };
 
@@ -71,17 +71,17 @@ export function schemaEndpointBranch<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
   Schema extends z.ZodType | undefined,
-  EndpointArgs extends Record<string, string | string[]> | undefined,
-  ServerSideImports extends (() => Promise<any>) | undefined,
+  Segments extends Record<string, string | string[]> | undefined,
+  SSI extends (() => Promise<any>) | undefined,
 >(
-  config: IkkanConfig<Method, Output, Schema, EndpointArgs, ServerSideImports>,
+  config: IkkanConfig<Method, Output, Schema, Segments, SSI>,
   supplementaryArgs: unknown[],
   branches: SchemaEndpointBranchParams<
     Method,
     Output,
     Schema,
-    EndpointArgs,
-    ServerSideImports
+    Segments,
+    SSI
   >,
 ) {
   const { endpoint, method } = config;

@@ -9,7 +9,7 @@ export const { hook: usePostTaskTag, action: taskTag } = ikkanClientBridge(
       config,
       apiTasksConfig,
     )({
-      endpointGenerator: ({ args: { id } }) => ({ id }),
+      endpointGenerator: ({ segments: { id } }) => ({ id }),
       mutator: (cachedValue, response) => {
         return response;
       },

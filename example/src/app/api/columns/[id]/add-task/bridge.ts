@@ -7,7 +7,7 @@ export const { hook: useAddTask, action: addTask } = ikkanClientBridge(config, [
     config,
     apiColumnsTasksConfig,
   )({
-    endpointGenerator: ({ args: { id } }) => ({ id }),
+    endpointGenerator: ({ segments: { id } }) => ({ id }),
     mutator: (cachedValue, response) => {
       return cachedValue ? [...cachedValue, response] : [response];
     },

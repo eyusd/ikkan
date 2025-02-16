@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { Header } from "@/components/header";
 import { UtilsBar } from "@/components/utils-bar";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
@@ -5,7 +7,10 @@ import { Column } from "@/components/column";
 import { getColumns } from "./api/columns/(get)/bridge";
 
 export default async function Home() {
-  const columns = await getColumns()();
+  const columns = await getColumns()().catch((error) => {
+    console.error(error);
+    return [];
+  });
 
   return (
     <div className="h-full py-16">

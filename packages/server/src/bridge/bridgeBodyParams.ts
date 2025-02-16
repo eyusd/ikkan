@@ -16,8 +16,8 @@ export function ikkanServerBridgeBodyParamsNoEndpoint<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
   Schema extends z.ZodType,
-  ServerSideImports extends (() => Promise<any>) | undefined,
->(config: IkkanConfig<Method, Output, Schema, undefined, ServerSideImports>) {
+  SSI extends (() => Promise<any>) | undefined,
+>(config: IkkanConfig<Method, Output, Schema, undefined, SSI>) {
   const { endpoint, method } = config;
 
   const fetcher = makeFetcherBodyParamsNoEndpoint<Method, Output, Schema>(
@@ -36,10 +36,10 @@ export function ikkanServerBridgeBodyParamsWithEndpoint<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
   Schema extends z.ZodType,
-  EndpointArgs extends Record<string, string | string[]>,
-  ServerSideImports extends (() => Promise<any>) | undefined,
+  Segments extends Record<string, string | string[]>,
+  SSI extends (() => Promise<any>) | undefined,
 >(
-  config: IkkanConfig<Method, Output, Schema, EndpointArgs, ServerSideImports>,
+  config: IkkanConfig<Method, Output, Schema, Segments, SSI>,
 ) {
   const { endpoint, method } = config;
 
@@ -47,12 +47,12 @@ export function ikkanServerBridgeBodyParamsWithEndpoint<
     Method,
     Output,
     Schema,
-    EndpointArgs
+    Segments
   >(endpoint, method);
 
   return partializeFetcherWithEndpoint(fetcher) as IkkanServerBridgeHandler<
     Output,
     Schema,
-    EndpointArgs
+    Segments
   >;
 }

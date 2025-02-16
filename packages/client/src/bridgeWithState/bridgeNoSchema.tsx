@@ -12,10 +12,10 @@ import { clientHookNoEndpoint, clientHookWithEndpoint } from "src/utils";
 export function bridgeNoSchemaNoEndpoint<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
-  ServerSideImports extends (() => Promise<any>) | undefined,
+  SSI extends (() => Promise<any>) | undefined,
   T extends JsonValue[],
 >(
-  config: IkkanConfig<Method, Output, undefined, undefined, ServerSideImports>,
+  config: IkkanConfig<Method, Output, undefined, undefined, SSI>,
   sideEffects: IkkanSideEffects<T, Output, undefined, undefined>,
 ) {
   const { endpoint, method } = config;
@@ -30,25 +30,25 @@ export function bridgeNoSchemaNoEndpoint<
 export function bridgeNoSchemaWithEndpoint<
   Method extends NextHTTPMethod,
   Output extends JsonValue,
-  EndpointArgs extends Record<string, string | string[]>,
-  ServerSideImports extends (() => Promise<any>) | undefined,
+  Segments extends Record<string, string | string[]>,
+  SSI extends (() => Promise<any>) | undefined,
   T extends JsonValue[],
 >(
   config: IkkanConfig<
     Method,
     Output,
     undefined,
-    EndpointArgs,
-    ServerSideImports
+    Segments,
+    SSI
   >,
-  sideEffects: IkkanSideEffects<T, Output, undefined, EndpointArgs>,
+  sideEffects: IkkanSideEffects<T, Output, undefined, Segments>,
 ) {
   const { endpoint, method } = config;
-  const fetcher = makeFetcherNoSchemaWithEndpoint<Method, Output, EndpointArgs>(
+  const fetcher = makeFetcherNoSchemaWithEndpoint<Method, Output, Segments>(
     endpoint,
     method,
   );
-  const transform = makeTransformWithEndpoint<Output, undefined, EndpointArgs>(
+  const transform = makeTransformWithEndpoint<Output, undefined, Segments>(
     endpoint,
   );
   return clientHookWithEndpoint(fetcher, sideEffects, transform);
