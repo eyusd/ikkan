@@ -37,7 +37,7 @@ export async function ikkanHandlerBodyParamsNoSSI<
     try {
       const params = await parseBodyGuard(req, schema);
       const segments = await context;
-      return NextResponse.json(await fn(req, params, segments), {
+      return NextResponse.json(await fn({req, params, segments}), {
         status: 200,
       });
     } catch (error) {
@@ -61,7 +61,7 @@ export async function ikkanHandlerBodyParamsWithSSI<
     try {
       const params = await parseBodyGuard(req, schema);
       const segments = await context;
-      return NextResponse.json(await fn(req, params, segments, imports), {
+      return NextResponse.json(await fn({req, params, segments, imports}), {
         status: 200,
       });
     } catch (error) {

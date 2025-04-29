@@ -1,5 +1,11 @@
 # @ikkan/core
 
+## 4.0.0
+
+### Major Changes
+
+- API modification
+
 ## 3.2.0
 
 ### Minor Changes

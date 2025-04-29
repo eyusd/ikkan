@@ -8,7 +8,7 @@ export const config = ikkanConfig({
   schema: z.object({
     date: z.string(),
   }),
-  fn: async (_req, { date }, { id }) => {
+  fn: async ({params: { date }, segments: { id } }) => {
     // update the task name
     const task = await prisma.task.update({
       where: {

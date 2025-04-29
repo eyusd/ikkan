@@ -25,7 +25,7 @@ export async function ikkanHandlerNoSchemaNoSSI<
   return async (req, { params: context }) => {
     try {
       const segments = await context;
-      return NextResponse.json(await fn(req, segments), { status: 200 });
+      return NextResponse.json(await fn({req, segments}), { status: 200 });
     } catch (error) {
       return handleError(error);
     }
@@ -51,7 +51,7 @@ export async function ikkanHandlerNoSchemaWithSSI<
   return async (req, { params: context }) => {
     try {
       const segments = await context;
-      return NextResponse.json(await fn(req, segments, imports), {
+      return NextResponse.json(await fn({req, segments, imports}), {
         status: 200,
       });
     } catch (error) {

@@ -1,5 +1,18 @@
 # example
 
+## 2.0.0
+
+### Major Changes
+
+- API modification
+
+### Patch Changes
+
+- Updated dependencies
+  - @ikkan/server@5.0.0
+  - @ikkan/core@4.0.0
+  - @ikkan/client@5.0.0
+
 ## 1.1.0
 
 ### Minor Changes

@@ -38,45 +38,72 @@ export type IkkanConfig<
   method: Method;
   endpoint: EndpointGenerator<Segments>;
 } & (Schema extends z.ZodType ? { schema: Schema } : {}) &
-  (SSI extends () => Promise<any>
-    ? { ssi: SSI }
-    : {}) & {
+  (SSI extends () => Promise<any> ? { ssi: SSI } : {}) & {
     fn: Segments extends Record<string, string | string[]>
       ? Schema extends z.ZodType
         ? SSI extends () => Promise<any>
-          ? (
-              req: NextRequest,
-              params: z.infer<Schema>,
-              segments: NextDynamicSegments<Segments>,
-              imports: Awaited<ReturnType<SSI>>,
-            ) => Promise<Output>
-          : (
-              req: NextRequest,
-              params: z.infer<Schema>,
-              segments: NextDynamicSegments<Segments>,
-            ) => Promise<Output>
+          ? ({
+              req,
+              params,
+              segments,
+              imports,
+            }: {
+              req: NextRequest;
+              params: z.infer<Schema>;
+              segments: NextDynamicSegments<Segments>;
+              imports: Awaited<ReturnType<SSI>>;
+            }) => Promise<Output>
+          : ({
+              req,
+              params,
+              segments,
+            }: {
+              req: NextRequest;
+              params: z.infer<Schema>;
+              segments: NextDynamicSegments<Segments>;
+            }) => Promise<Output>
         : SSI extends () => Promise<any>
-          ? (
-              req: NextRequest,
-              segments: NextDynamicSegments<Segments>,
-              imports: Awaited<ReturnType<SSI>>,
-            ) => Promise<Output>
-          : (
-              req: NextRequest,
-              segments: NextDynamicSegments<Segments>,
-            ) => Promise<Output>
+          ? ({
+              req,
+              segments,
+              imports,
+            }: {
+              req: NextRequest;
+              segments: NextDynamicSegments<Segments>;
+              imports: Awaited<ReturnType<SSI>>;
+            }) => Promise<Output>
+          : ({
+              req,
+              segments,
+            }: {
+              req: NextRequest;
+              segments: NextDynamicSegments<Segments>;
+            }) => Promise<Output>
       : Schema extends z.ZodType
         ? SSI extends () => Promise<any>
-          ? (
-              req: NextRequest,
-              params: z.infer<Schema>,
-              imports: Awaited<ReturnType<SSI>>,
-            ) => Promise<Output>
-          : (req: NextRequest, params: z.infer<Schema>) => Promise<Output>
+          ? ({
+              req,
+              params,
+              imports,
+            }: {
+              req: NextRequest;
+              params: z.infer<Schema>;
+              imports: Awaited<ReturnType<SSI>>;
+            }) => Promise<Output>
+          : ({
+              req,
+              params,
+            }: {
+              req: NextRequest;
+              params: z.infer<Schema>;
+            }) => Promise<Output>
         : SSI extends () => Promise<any>
-          ? (
-              req: NextRequest,
-              imports: Awaited<ReturnType<SSI>>,
-            ) => Promise<Output>
-          : (req: NextRequest) => Promise<Output>;
+          ? ({
+              req,
+              imports,
+            }: {
+              req: NextRequest;
+              imports: Awaited<ReturnType<SSI>>;
+            }) => Promise<Output>
+          : ({ req }: { req: NextRequest }) => Promise<Output>;
   };

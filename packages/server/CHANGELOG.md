@@ -1,5 +1,16 @@
 # @ikkan/server
 
+## 5.0.0
+
+### Major Changes
+
+- API modification
+
+### Patch Changes
+
+- Updated dependencies
+  - @ikkan/core@4.0.0
+
 ## 4.0.0
 
 ### Minor Changes

@@ -39,7 +39,7 @@ export async function ikkanHandlerSearchParamsNoSSI<
     try {
       const params = await parseSearchGuard(req, schema);
       const segments = await context;
-      return NextResponse.json(await fn(req, params, segments), {
+      return NextResponse.json(await fn({req, params, segments}), {
         status: 200,
       });
     } catch (error) {
@@ -63,7 +63,7 @@ export async function ikkanHandlerSearchParamsWithSSI<
     try {
       const params = await parseSearchGuard(req, schema);
       const segments = await context;
-      return NextResponse.json(await fn(req, params, segments, imports), {
+      return NextResponse.json(await fn({req, params, segments, imports}), {
         status: 200,
       });
     } catch (error) {

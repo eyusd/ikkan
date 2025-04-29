@@ -4,7 +4,7 @@ import { ikkanConfig } from "@ikkan/core";
 export const config = ikkanConfig({
   endpoint: ({ id }: { id: string }) => `/api/columns/${id}/tasks`,
   method: "GET",
-  fn: async (_req, { id }) => {
+  fn: async ({segments: { id }}) => {
     // get all tasks related to the column id
     const tasks = await prisma.task.findMany({
       where: {

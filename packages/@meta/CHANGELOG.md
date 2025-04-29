@@ -1,5 +1,11 @@
 # ikkan
 
+## 4.0.0
+
+### Major Changes
+
+- API modification
+
 ## 3.1.2
 
 ### Patch Changes

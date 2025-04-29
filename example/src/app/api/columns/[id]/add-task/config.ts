@@ -11,7 +11,7 @@ export const config = ikkanConfig({
     date: z.string(),
     tag: z.string(),
   }),
-  fn: async (_req, { name, content, date, tag }, { id }) => {
+  fn: async ({params: { name, content, date, tag }, segments: { id }}) => {
     // create a new task
     const task = await prisma.task.create({
       data: {
